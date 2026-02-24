@@ -79,10 +79,9 @@ export default function ExportsPage() {
                         disabled={downloading === template.id}
                         className="p-5 text-left rounded-2xl border transition-all group disabled:opacity-50"
                         style={{
-                            background: "transparent",
-                            borderColor: "rgba(232, 98, 26, 0.3)",
-                            boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                            backdropFilter: "blur(4px)"
+                            background: "rgba(0, 0, 0, 0.15)",
+                            borderColor: "rgba(232, 98, 26, 0.2)",
+                            boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
                         }}
                     >
                         <span className="text-2xl block mb-3">{template.icon}</span>
@@ -108,10 +107,9 @@ export default function ExportsPage() {
             </h2>
             <div className="p-6 rounded-2xl border mb-6"
                 style={{
-                    background: "transparent",
-                    borderColor: "rgba(232, 98, 26, 0.3)",
-                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-                    backdropFilter: "blur(8px)"
+                    background: "rgba(0, 0, 0, 0.2)",
+                    borderColor: "rgba(232, 98, 26, 0.2)",
+                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                 }}>
                 <p className="text-sm mb-4 font-medium text-white" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
                     Apply filters and export matching participants as CSV

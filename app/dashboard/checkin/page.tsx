@@ -109,10 +109,9 @@ export default function CheckinPage() {
                             {results.map((team) => (
                                 <div key={team._id} className="p-4 rounded-2xl border mb-4 transition-all"
                                     style={{
-                                        background: "transparent",
-                                        borderColor: "rgba(232, 98, 26, 0.3)",
-                                        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                                        backdropFilter: "blur(8px)"
+                                        background: "rgba(0, 0, 0, 0.15)",
+                                        borderColor: "rgba(232, 98, 26, 0.2)",
+                                        boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
                                     }}>
                                     <p className="text-xs font-bold mb-3 flex items-center gap-2" style={{ color: "var(--accent-amber)", fontFamily: "var(--font-display)", textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
                                         <Shield size={16} /> {team.teamName}
@@ -164,10 +163,9 @@ export default function CheckinPage() {
                 <div>
                     <div className="p-5 sticky top-6 rounded-2xl border"
                         style={{
-                            background: "transparent",
-                            borderColor: "rgba(232, 98, 26, 0.3)",
-                            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-                            backdropFilter: "blur(8px)"
+                            background: "rgba(0, 0, 0, 0.2)",
+                            borderColor: "rgba(232, 98, 26, 0.2)",
+                            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                         }}>
                         <h3 className="text-sm font-bold uppercase tracking-wider mb-4 flex items-center gap-2" style={{ color: "var(--accent-orange)", fontFamily: "var(--font-display)", textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
                             <ClipboardList size={18} /> Recent Check-ins

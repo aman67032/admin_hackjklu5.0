@@ -91,10 +91,9 @@ export default function RegistrationsPage() {
             {/* Search & Filters */}
             <div className="p-5 mb-8 rounded-2xl border transition-all duration-300"
                 style={{
-                    background: "transparent",
-                    borderColor: "rgba(232, 98, 26, 0.3)",
-                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-                    backdropFilter: "blur(8px)"
+                    background: "rgba(0, 0, 0, 0.2)",
+                    borderColor: "rgba(232, 98, 26, 0.2)",
+                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
                 }}>
                 <div className="flex flex-col md:flex-row gap-3">
                     <div className="relative flex-1">
@@ -156,10 +155,9 @@ export default function RegistrationsPage() {
                         teams.map((team) => (
                             <div key={team._id} className="p-6 rounded-2xl border mb-4"
                                 style={{
-                                    background: "transparent",
-                                    borderColor: "rgba(232, 98, 26, 0.3)",
-                                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-                                    backdropFilter: "blur(8px)"
+                                    background: "rgba(0, 0, 0, 0.15)",
+                                    borderColor: "rgba(232, 98, 26, 0.2)",
+                                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                                 }}>
                                 <div className="flex items-start justify-between mb-4 border-b border-orange-500/30 pb-4">
                                     <div>
