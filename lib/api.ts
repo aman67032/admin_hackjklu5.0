@@ -1,4 +1,15 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const getApiBase = () => {
+    let url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    // Remove trailing slashes
+    url = url.replace(/\/+$/, '');
+    // Ensure it ends with /api if not already present
+    if (!url.endsWith('/api')) {
+        url = `${url}/api`;
+    }
+    return url;
+};
+
+const API_BASE = getApiBase();
 
 interface FetchOptions extends RequestInit {
     skipAuth?: boolean;

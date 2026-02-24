@@ -51,11 +51,12 @@ function ParticleField() {
         return geometry;
     }, [count]);
 
-    const startTime = useRef(performance.now());
+    const timer = useMemo(() => new THREE.Timer(), []);
 
     useFrame((state) => {
-        // Use performance.now() to avoid deprecated THREE.Clock warning from state.clock
-        const t = (performance.now() - startTime.current) / 1000;
+        timer.update(state.clock.elapsedTime * 1000); // Timer expects ms
+        const t = timer.getElapsed();
+
         // Slow rotation for less distraction
         pointsRef.current.rotation.y = t * 0.03;
         pointsRef.current.rotation.x = Math.sin(t * 0.2) * 0.1;
@@ -79,11 +80,12 @@ function ParticleField() {
 function WireframeRing({ radius, color, speed, opacity = 0.3 }: { radius: number; color: string; speed: number; opacity?: number }) {
     const ringRef = useRef<THREE.Mesh>(null!);
 
-    const startTime = useRef(performance.now());
+    const timer = useMemo(() => new THREE.Timer(), []);
 
     useFrame((state) => {
-        // Use performance.now() to avoid deprecated THREE.Clock warning from state.clock
-        const t = (performance.now() - startTime.current) / 1000;
+        timer.update(state.clock.elapsedTime * 1000);
+        const t = timer.getElapsed();
+
         ringRef.current.rotation.z = t * speed;
         ringRef.current.rotation.x = Math.sin(t * 0.3) * 0.2;
     });
