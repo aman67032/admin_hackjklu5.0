@@ -73,7 +73,7 @@ function OrbModel() {
                     roughness: 0.05,
                     ior: 1.5,
                     thickness: 2,
-                    emissive: '#d99b68d3',
+                    emissive: '#d99b68',
                     emissiveIntensity: 0.1 // Much lower emission to prevent whitening
                 });
             }

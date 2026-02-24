@@ -36,13 +36,13 @@ export default function LoadingScreen({
     const owlGroupVariants: Variants = {
         initial: {
             scale: 3.2,
-            x: 884.5, // Center owl horizontally in SVG viewBox (1194.5 - 310)
-            y: 0,  // Center owl vertically in SVG viewBox
+            x: 526, // Shift to center owl center (422) at viewBox center (1194.5)
+            y: -179, // Shift to center owl center (350) at viewBox center (347)
         },
         move: {
             scale: 1,
-            x: 0,
-            y: 0,
+            x: 105, // Shift full logo (center 1089) to viewBox center (1194.5)
+            y: -3,
             transition: {
                 delay: 3.5,
                 duration: 2.0,
