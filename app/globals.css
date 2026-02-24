@@ -35,7 +35,7 @@
   --earth-accent-glow: rgba(232, 98, 26, 0.25);
 
   /* Dark Earthy Theme Refinement - Transparent Edition */
-  --background-alt: #0a0e2a;
+  --background-alt: #2a170a;
   --foreground-alt: #f0ece2;
   --accent-orange: #e8621a;
   --accent-amber: #f59e0b;
@@ -57,8 +57,8 @@
   /* Semantic */
   --bg-primary: var(--navy);
   --bg-secondary: var(--navy-light);
-  --bg-card: rgba(17, 22, 64, 0.7);
-  --bg-card-hover: rgba(26, 31, 80, 0.8);
+  --bg-card: rgba(64, 41, 17, 0.7);
+  --bg-card-hover: rgba(80, 40, 26, 0.8);
   --text-primary: var(--marble);
   --text-secondary: #a0a4c0;
   --text-muted: #6b6f90;
