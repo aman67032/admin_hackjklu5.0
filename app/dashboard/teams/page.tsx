@@ -12,6 +12,7 @@ export default function TeamsPage() {
     const [editData, setEditData] = useState<{ teamNumber: string; roomNumber: string; status: string }>({ teamNumber: "", roomNumber: "", status: "" });
     const [swapMode, setSwapMode] = useState(false);
     const [swapSelection, setSwapSelection] = useState<{ teamId: string; memberIndex: number; teamName: string; memberName: string } | null>(null);
+    const [importing, setImporting] = useState(false);
 
     const loadTeams = useCallback(async () => {
         setLoading(true);
@@ -68,6 +69,24 @@ export default function TeamsPage() {
         }
     };
 
+    const handleImportDevfolio = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setImporting(true);
+        try {
+            const res = await teamsApi.importDevfolio(file);
+            alert(`Success! Imported ${res.imported} new teams. Updated ${res.updated} existing teams.`);
+            loadTeams();
+        } catch (err: any) {
+            console.error(err);
+            alert(`Import failed: ${err.message || "Unknown error"}`);
+        } finally {
+            setImporting(false);
+            e.target.value = ''; // reset file input
+        }
+    };
+
     return (
         <div className="page-container animate-fade-in">
             {/* Header */}
@@ -96,6 +115,13 @@ export default function TeamsPage() {
                             {swapMode ? <><X size={16} /> Cancel Swap</> : <><RefreshCw size={16} /> Swap Mode</>}
                         </span>
                     </button>
+                    <div className="w-px h-6 bg-orange-500/20 mx-1"></div>
+                    <label className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all duration-300 btn-ghost opacity-60 hover:opacity-100 cursor-pointer ${importing ? "opacity-50 cursor-not-allowed" : ""}`}>
+                        <span className="flex items-center gap-2 justify-center font-bold text-[10px] uppercase tracking-widest">
+                            {importing ? "Importing..." : "Import Devfolio CSV"}
+                        </span>
+                        <input type="file" accept=".csv" className="hidden" onChange={handleImportDevfolio} disabled={importing} />
+                    </label>
                 </div>
             </div>
 

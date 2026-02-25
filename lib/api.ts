@@ -23,6 +23,10 @@ async function apiFetch<T>(endpoint: string, options: FetchOptions = {}): Promis
         ...(fetchOptions.headers as Record<string, string>),
     };
 
+    if (fetchOptions.body instanceof FormData) {
+        delete headers['Content-Type'];
+    }
+
     if (!skipAuth && typeof window !== 'undefined') {
         const token = localStorage.getItem('hackjklu_token');
         if (token) {
@@ -101,6 +105,14 @@ export const teamsApi = {
             method: 'POST',
             body: JSON.stringify({ teams }),
         }),
+    importDevfolio: (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return apiFetch<{ message: string; imported: number; updated: number }>('/teams/import-devfolio', {
+            method: 'POST',
+            body: formData,
+        });
+    },
 };
 
 // Stats
