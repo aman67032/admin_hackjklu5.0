@@ -18,7 +18,7 @@ function StatCard({ icon, label, value, subtitle, color }: {
     return (
         <div className="stat-card p-6 rounded-2xl border transition-all duration-300 hover:translate-y-[-2px]"
             style={{
-                background: "rgba(0, 0, 0, 0.4)",
+                background: "#111111",
                 borderColor: "rgba(232, 98, 26, 0.4)",
                 boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
                 backdropFilter: "blur(8px)"
@@ -55,7 +55,7 @@ function BreakdownCard({ title, data, icon }: { title: string; data: Record<stri
     return (
         <div className="p-6 rounded-2xl border"
             style={{
-                background: "rgba(0, 0, 0, 0.4)",
+                background: "#111111",
                 borderColor: "rgba(232, 98, 26, 0.2)",
                 boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
                 backdropFilter: "blur(12px)"

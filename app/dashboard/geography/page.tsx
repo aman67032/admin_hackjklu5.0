@@ -129,7 +129,7 @@ export default function GeographyPage() {
                 {/* Map */}
                 <div className="lg:col-span-3 p-6 rounded-2xl border relative"
                     style={{
-                        background: "rgba(0, 0, 0, 0.4)",
+                        background: "#111111",
                         borderColor: "rgba(232, 98, 26, 0.25)",
                         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
                     }}>
@@ -183,7 +183,7 @@ export default function GeographyPage() {
                         <div
                             className="absolute top-4 right-4 p-4 rounded-xl border backdrop-blur-md z-10"
                             style={{
-                                background: "rgba(0, 0, 0, 0.85)",
+                                background: "#000000",
                                 borderColor: "rgba(232, 98, 26, 0.4)",
                             }}
                         >
@@ -215,7 +215,7 @@ export default function GeographyPage() {
                 {/* State List */}
                 <div className="lg:col-span-2 p-6 rounded-2xl border overflow-hidden"
                     style={{
-                        background: "rgba(0, 0, 0, 0.4)",
+                        background: "#111111",
                         borderColor: "rgba(232, 98, 26, 0.25)",
                         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
                     }}>
@@ -234,7 +234,7 @@ export default function GeographyPage() {
                                 <div key={stateData.state}
                                     className="rounded-xl border overflow-hidden transition-all duration-200"
                                     style={{
-                                        background: selectedState === stateId ? "rgba(232, 98, 26, 0.15)" : "rgba(0, 0, 0, 0.3)",
+                                        background: selectedState === stateId ? "rgba(232, 98, 26, 0.15)" : "#18181b",
                                         borderColor: selectedState === stateId ? "rgba(232, 98, 26, 0.4)" : "rgba(255, 255, 255, 0.05)",
                                     }}
                                     onMouseEnter={() => stateId && setHoveredState(stateId)}

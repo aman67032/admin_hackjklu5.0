@@ -109,7 +109,7 @@ export default function CheckinPage() {
                             {results.map((team) => (
                                 <div key={team._id} className="p-4 rounded-2xl border mb-4 transition-all"
                                     style={{
-                                        background: "rgba(0, 0, 0, 0.3)",
+                                        background: "#111111",
                                         borderColor: "rgba(232, 98, 26, 0.2)",
                                         boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
                                     }}>
@@ -119,7 +119,7 @@ export default function CheckinPage() {
                                     </p>
 
                                     {/* Leader */}
-                                    <div className="flex items-center gap-3 p-3 rounded-xl mb-2" style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                    <div className="flex items-center gap-3 p-3 rounded-xl mb-2" style={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.05)" }}>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-bold text-white">{team.leaderName}</p>
                                             <p className="text-xs" style={{ color: "var(--accent-amber)" }}>{team.leaderEmail} · Leader</p>
@@ -137,7 +137,7 @@ export default function CheckinPage() {
 
                                     {/* Members */}
                                     {team.members.map((member: any, idx: number) => (
-                                        <div key={idx} className="flex items-center gap-3 p-3 rounded-xl mb-1" style={{ background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255,255,255,0.03)" }}>
+                                        <div key={idx} className="flex items-center gap-3 p-3 rounded-xl mb-1" style={{ background: "#18181b", border: "1px solid rgba(255,255,255,0.03)" }}>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-bold text-white">{member.name}</p>
                                                 <p className="text-xs" style={{ color: "var(--accent-amber)" }}>{member.email} · Member</p>
@@ -163,7 +163,7 @@ export default function CheckinPage() {
                 <div>
                     <div className="p-5 sticky top-6 rounded-2xl border"
                         style={{
-                            background: "rgba(0, 0, 0, 0.3)",
+                            background: "#111111",
                             borderColor: "rgba(232, 98, 26, 0.2)",
                             boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                         }}>
@@ -177,7 +177,7 @@ export default function CheckinPage() {
                         ) : (
                             <div className="space-y-2 max-h-[60vh] overflow-y-auto">
                                 {recentCheckins.map((checkin, idx) => (
-                                    <div key={idx} className="p-3 rounded-xl animate-fade-in border border-white/5" style={{ background: "rgba(0, 0, 0, 0.4)" }}>
+                                    <div key={idx} className="p-3 rounded-xl animate-fade-in border border-white/5" style={{ background: "#0a0a0a" }}>
                                         <p className="text-sm font-bold text-white">{checkin.name}</p>
                                         <p className="text-[11px] flex justify-between mt-1" style={{ color: "var(--accent-amber)" }}>
                                             <span>{checkin.team}</span>
