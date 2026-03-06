@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { X, RefreshCw, Search, Home, Edit2, Check } from "lucide-react";
+import { X, Search, Home, Edit2, Check } from "lucide-react";
 import { teamsApi } from "@/lib/api";
 
 export default function TeamsPage() {
@@ -10,9 +10,6 @@ export default function TeamsPage() {
     const [search, setSearch] = useState("");
     const [editingTeam, setEditingTeam] = useState<string | null>(null);
     const [editData, setEditData] = useState<{ teamNumber: string; roomNumber: string; status: string }>({ teamNumber: "", roomNumber: "", status: "" });
-    const [swapMode, setSwapMode] = useState(false);
-    const [swapSelection, setSwapSelection] = useState<{ teamId: string; memberIndex: number; teamName: string; memberName: string } | null>(null);
-    const [importing, setImporting] = useState(false);
 
     const loadTeams = useCallback(async () => {
         setLoading(true);
@@ -49,44 +46,6 @@ export default function TeamsPage() {
         }
     };
 
-    const handleSwapSelect = (teamId: string, memberIndex: number, teamName: string, memberName: string) => {
-        if (!swapSelection) {
-            setSwapSelection({ teamId, memberIndex, teamName, memberName });
-        } else {
-            // Execute swap
-            executeSwap(swapSelection.teamId, swapSelection.memberIndex, teamId, memberIndex);
-        }
-    };
-
-    const executeSwap = async (fromTeamId: string, fromIdx: number, toTeamId: string, toIdx: number) => {
-        try {
-            await teamsApi.swap(fromTeamId, fromIdx, toTeamId, toIdx);
-            setSwapMode(false);
-            setSwapSelection(null);
-            loadTeams();
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const handleImportDevfolio = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setImporting(true);
-        try {
-            const res = await teamsApi.importDevfolio(file);
-            alert(`Success! Imported ${res.imported} new teams. Updated ${res.updated} existing teams.`);
-            loadTeams();
-        } catch (err: any) {
-            console.error(err);
-            alert(`Import failed: ${err.message || "Unknown error"}`);
-        } finally {
-            setImporting(false);
-            e.target.value = ''; // reset file input
-        }
-    };
-
     return (
         <div className="page-container animate-fade-in">
             {/* Header */}
@@ -103,50 +62,10 @@ export default function TeamsPage() {
                         THE ARMIES
                     </h1>
                     <p className="text-xs mt-3 font-bold tracking-[0.3em] uppercase opacity-80" style={{ color: "var(--accent-amber)" }}>
-                        Manage teams, assign numbers, and swap members in the forge
+                        Manage teams, assign numbers, and organize the forge
                     </p>
                 </div>
-                <div className="flex items-center gap-2 p-1 rounded-xl bg-orange-500/5 backdrop-blur-sm border border-orange-500/10">
-                    <button
-                        onClick={() => { setSwapMode(!swapMode); setSwapSelection(null); }}
-                        className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all duration-300 ${swapMode ? "btn-danger shadow-lg shadow-red-500/20" : "btn-ghost opacity-60 hover:opacity-100"}`}
-                    >
-                        <span className="flex items-center gap-2 justify-center font-bold text-[10px] uppercase tracking-widest">
-                            {swapMode ? <><X size={16} /> Cancel Swap</> : <><RefreshCw size={16} /> Swap Mode</>}
-                        </span>
-                    </button>
-                    <div className="w-px h-6 bg-orange-500/20 mx-1"></div>
-                    <label className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all duration-300 btn-ghost opacity-60 hover:opacity-100 cursor-pointer ${importing ? "opacity-50 cursor-not-allowed" : ""}`}>
-                        <span className="flex items-center gap-2 justify-center font-bold text-[10px] uppercase tracking-widest">
-                            {importing ? "Importing..." : "Import Devfolio CSV"}
-                        </span>
-                        <input type="file" accept=".csv" className="hidden" onChange={handleImportDevfolio} disabled={importing} />
-                    </label>
-                </div>
             </div>
-
-            {/* Swap Banner */}
-            {swapMode && (
-                <div className="p-5 mb-8 rounded-2xl border flex items-center gap-4 animate-pulse"
-                    style={{
-                        background: "rgba(232, 98, 26, 0.15)",
-                        borderColor: "var(--accent-orange)"
-                    }}>
-                    <span className="text-xl flex items-center justify-center text-orange-500"><RefreshCw size={24} /></span>
-                    <div className="flex-1 font-bold tracking-wide italic">
-                        {swapSelection ? (
-                            <p className="text-sm" style={{ color: "var(--accent-orange)" }}>
-                                Selected <span className="underline decoration-wavy">{swapSelection.memberName}</span> from {swapSelection.teamName} — now click another member to swap
-                            </p>
-                        ) : (
-                            <p className="text-sm text-orange-600/80">Click a team member to start the swap cycle</p>
-                        )}
-                    </div>
-                    {swapSelection && (
-                        <button onClick={() => setSwapSelection(null)} className="btn-gold text-[10px] px-3 py-1 uppercase tracking-tighter">Clear</button>
-                    )}
-                </div>
-            )}
 
             {/* Search */}
             <div className="mb-10 max-w-xl mx-auto relative group">
@@ -232,7 +151,7 @@ export default function TeamsPage() {
                             <div className="space-y-2">
                                 {/* Leader */}
                                 <div
-                                    className={`flex items-center gap-3 p-2.5 rounded-lg transition-colors ${swapMode ? 'cursor-pointer hover:bg-white/5' : ''}`}
+                                    className={`flex items-center gap-3 p-2.5 rounded-lg transition-colors`}
                                     style={{ background: "rgba(212, 168, 67, 0.05)", border: "1px solid rgba(212, 168, 67, 0.1)" }}
                                 >
                                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
@@ -252,8 +171,7 @@ export default function TeamsPage() {
                                 {team.members.map((member: any, idx: number) => (
                                     <div
                                         key={idx}
-                                        onClick={() => swapMode && handleSwapSelect(team._id, idx, team.teamName, member.name)}
-                                        className={`flex items-center gap-3 p-2.5 rounded-lg transition-colors ${swapMode ? 'cursor-pointer hover:bg-white/5' : ''} ${swapSelection?.teamId === team._id && swapSelection?.memberIndex === idx ? 'ring-2 ring-yellow-400/50' : ''}`}
+                                        className={`flex items-center gap-3 p-2.5 rounded-lg transition-colors`}
                                         style={{ background: "var(--navy)", border: "1px solid var(--border)" }}
                                     >
                                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0"
