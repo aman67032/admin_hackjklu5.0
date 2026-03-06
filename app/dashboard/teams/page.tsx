@@ -91,10 +91,11 @@ export default function TeamsPage() {
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {teams.map((team) => (
-                        <div key={team._id} className="p-6 rounded-2xl border transition-all duration-300"
+                        <div key={team._id}
+                            className="p-4 rounded-xl mb-4 border transition-colors cursor-pointer group hover:border-[var(--accent-orange)]"
                             style={{
-                                background: "rgba(0, 0, 0, 0.15)",
-                                borderColor: "rgba(232, 98, 26, 0.2)",
+                                background: "#111111",
+                                borderColor: "rgba(255, 255, 255, 0.05)",
                                 boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                             }}>
                             <div className="flex items-start justify-between mb-5 border-b border-orange-500/30 pb-4">
@@ -115,7 +116,7 @@ export default function TeamsPage() {
 
                             {/* Edit Form */}
                             {editingTeam === team._id && (
-                                <div className="p-4 rounded-xl mb-6 space-y-3" style={{ background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(232, 98, 26, 0.3)" }}>
+                                <div className="p-4 rounded-xl mb-6 space-y-3" style={{ background: "#0a0a0a", border: "1px solid rgba(232, 98, 26, 0.3)" }}>
                                     <div className="flex gap-2">
                                         <input
                                             type="number"
