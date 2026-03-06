@@ -137,7 +137,7 @@ export default function RegistrationsPage() {
             {/* Search & Filters */}
             <div className="p-5 mb-8 rounded-2xl border transition-all duration-300"
                 style={{
-                    background: "rgba(0, 0, 0, 0.2)",
+                    background: "rgba(0, 0, 0, 0.4)",
                     borderColor: "rgba(232, 98, 26, 0.2)",
                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
                 }}>
@@ -193,7 +193,7 @@ export default function RegistrationsPage() {
                         teams.map((team) => (
                             <div key={team._id} className="p-6 rounded-2xl border mb-4"
                                 style={{
-                                    background: "rgba(0, 0, 0, 0.15)",
+                                    background: "rgba(0, 0, 0, 0.4)",
                                     borderColor: "rgba(232, 98, 26, 0.2)",
                                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                                 }}>

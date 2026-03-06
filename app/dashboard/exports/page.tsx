@@ -77,7 +77,7 @@ export default function ExportsPage() {
                         disabled={downloading === template.id}
                         className="p-5 text-left rounded-2xl border transition-all group disabled:opacity-50"
                         style={{
-                            background: "rgba(0, 0, 0, 0.15)",
+                            background: "rgba(0, 0, 0, 0.4)",
                             borderColor: "rgba(232, 98, 26, 0.2)",
                             boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
                         }}
@@ -105,7 +105,7 @@ export default function ExportsPage() {
             </h2>
             <div className="p-6 rounded-2xl border mb-6"
                 style={{
-                    background: "rgba(0, 0, 0, 0.2)",
+                    background: "rgba(0, 0, 0, 0.4)",
                     borderColor: "rgba(232, 98, 26, 0.2)",
                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                 }}>

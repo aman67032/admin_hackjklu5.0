@@ -199,7 +199,7 @@ export default function SettingsPage() {
                     {/* Registration Lock */}
                     <div className="p-6 rounded-2xl border transition-all"
                         style={{
-                            background: "rgba(0, 0, 0, 0.2)",
+                            background: "#111111",
                             borderColor: "rgba(232, 98, 26, 0.2)",
                             boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                         }}>
@@ -234,7 +234,7 @@ export default function SettingsPage() {
                     {/* Data Management */}
                     <div className="p-6 rounded-2xl border transition-all"
                         style={{
-                            background: "rgba(0, 0, 0, 0.2)",
+                            background: "#111111",
                             borderColor: "rgba(232, 98, 26, 0.2)",
                             boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                         }}>

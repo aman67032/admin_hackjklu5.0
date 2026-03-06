@@ -43,10 +43,10 @@
   --accent-rose: #e11d48;
   --accent-teal: #10B981;
 
-  --card-bg-alt: #111111;
+  --card-bg-alt: rgba(0, 0, 0, 0.4);
   --card-border-alt: rgba(232, 98, 26, 0.3);
   --card-shadow-alt: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --input-bg-alt: #18181b;
+  --input-bg-alt: rgba(0, 0, 0, 0.6);
   --input-border-alt: rgba(232, 98, 26, 0.4);
   --input-focus-alt: rgba(232, 98, 26, 0.6);
 
@@ -57,8 +57,8 @@
   /* Semantic */
   --bg-primary: var(--navy);
   --bg-secondary: var(--navy-light);
-  --bg-card: #18181b;
-  --bg-card-hover: #27272a;
+  --bg-card: rgba(0, 0, 0, 0.5);
+  --bg-card-hover: rgba(0, 0, 0, 0.7);
   --text-primary: var(--marble);
   --text-secondary: #a0a4c0;
   --text-muted: #6b6f90;
