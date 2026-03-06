@@ -91,11 +91,10 @@ export default function TeamsPage() {
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {teams.map((team) => (
-                        <div key={team._id}
-                            className="p-4 rounded-xl mb-4 border transition-colors cursor-pointer group hover:border-[var(--accent-orange)]"
+                        <div key={team._id} className="p-6 rounded-2xl border transition-all duration-300"
                             style={{
                                 background: "#111111",
-                                borderColor: "rgba(255, 255, 255, 0.05)",
+                                borderColor: "rgba(232, 98, 26, 0.2)",
                                 boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                             }}>
                             <div className="flex items-start justify-between mb-5 border-b border-orange-500/30 pb-4">
