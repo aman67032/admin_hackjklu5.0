@@ -123,7 +123,6 @@ export const statsApi = {
             participants: { total: number; checkedIn: number; notCheckedIn: number };
             batchBreakdown: Record<string, number>;
             courseBreakdown: Record<string, number>;
-            typeBreakdown: { hosteller: number; dayScholar: number };
             messFoodCount: number;
         }>('/stats'),
 };

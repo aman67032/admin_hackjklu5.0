@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, Shield, User, Landmark, Utensils, Home, Sun, CheckCircle, BookOpen, GraduationCap } from "lucide-react";
+import { AlertTriangle, Shield, User, Landmark, Utensils, CheckCircle, BookOpen, GraduationCap, XCircle } from "lucide-react";
 import { statsApi } from "@/lib/api";
 
 interface Stats {
@@ -9,7 +9,6 @@ interface Stats {
     participants: { total: number; checkedIn: number; notCheckedIn: number };
     batchBreakdown: Record<string, number>;
     courseBreakdown: Record<string, number>;
-    typeBreakdown: { hosteller: number; dayScholar: number };
     messFoodCount: number;
 }
 
@@ -189,8 +188,8 @@ export default function DashboardPage() {
 
             {/* Secondary Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <StatCard icon={<Home size={22} />} label="Hostellers" value={stats.typeBreakdown.hosteller} color="#6b4c3b" />
-                <StatCard icon={<Sun size={22} />} label="Day Scholars" value={stats.typeBreakdown.dayScholar} color="#f97316" />
+                <StatCard icon={<Shield size={22} />} label="Complete Teams" value={stats.teams.complete} color="#10B981" />
+                <StatCard icon={<XCircle size={22} />} label="Incomplete Teams" value={stats.teams.incomplete} color="#ef4444" />
                 <StatCard icon={<CheckCircle size={22} />} label="Checked In" value={stats.participants.checkedIn} color="#10B981" />
             </div>
 

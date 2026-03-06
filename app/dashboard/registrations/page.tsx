@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Shield, User, Search, Github, Linkedin, FileText, Check, X, ArrowLeft, ArrowRight } from "lucide-react";
+import { Shield, User, Search, Github, Linkedin, FileText, Check, X, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import { teamsApi } from "@/lib/api";
 
 export default function RegistrationsPage() {
@@ -9,7 +9,7 @@ export default function RegistrationsPage() {
     const [loading, setLoading] = useState(true);
     const [pagination, setPagination] = useState({ page: 1, limit: 30, total: 0, pages: 0 });
     const [search, setSearch] = useState("");
-    const [filters, setFilters] = useState({ batch: "", course: "", status: "", checkedIn: "", memberType: "" });
+    const [filters, setFilters] = useState({ city: "", college: "", checkedIn: "" });
     const [viewMode, setViewMode] = useState<"team" | "individual">("team");
     const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
@@ -51,11 +51,57 @@ export default function RegistrationsPage() {
         }
     };
 
+    // Collect unique cities and colleges for filter dropdowns
+    const allCities = new Set<string>();
+    const allColleges = new Set<string>();
+    teams.forEach(team => {
+        if (team.leaderCity) allCities.add(team.leaderCity);
+        if (team.leaderCollege) allColleges.add(team.leaderCollege);
+        team.members?.forEach((m: any) => {
+            if (m.city) allCities.add(m.city);
+            if (m.college) allColleges.add(m.college);
+        });
+    });
+
     // Flatten teams into participants for individual view
     const participants = viewMode === "individual"
         ? teams.flatMap(team => [
-            { ...team, _participantName: team.leaderName, _participantEmail: team.leaderEmail, _participantPhone: team.leaderPhone, _participantBatch: team.leaderBatch, _participantCourse: team.leaderCourse, _participantType: team.leaderType, _checkedIn: team.leaderCheckedIn, _gender: team.leaderGender, _city: team.leaderCity, _skills: team.leaderSkills, _github: team.leaderGithub, _linkedin: team.leaderLinkedin, _resume: team.leaderResume, _role: "Leader", _teamId: team._id, _memberIndex: -1 },
-            ...team.members.map((m: any, i: number) => ({ ...team, _participantName: m.name, _participantEmail: m.email, _participantPhone: m.phone, _participantBatch: m.batch, _participantCourse: m.course, _participantType: m.memberType, _checkedIn: m.checkedIn, _gender: m.gender, _city: m.city, _skills: m.skills, _github: m.github, _linkedin: m.linkedin, _resume: m.resume, _role: "Member", _teamId: team._id, _memberIndex: i })),
+            {
+                ...team,
+                _participantName: team.leaderName,
+                _participantEmail: team.leaderEmail,
+                _participantCollege: team.leaderCollege,
+                _participantCity: team.leaderCity,
+                _participantGender: team.leaderGender,
+                _participantBio: team.leaderBio,
+                _devfolioProfile: team.devfolioProfile,
+                _checkedIn: team.leaderCheckedIn,
+                _isRsvp: team.leaderIsRsvp,
+                _github: team.leaderGithub,
+                _linkedin: team.leaderLinkedin,
+                _resume: team.leaderResume,
+                _role: "Leader",
+                _teamId: team._id,
+                _memberIndex: -1,
+            },
+            ...team.members.map((m: any, i: number) => ({
+                ...team,
+                _participantName: m.name,
+                _participantEmail: m.email,
+                _participantCollege: m.college,
+                _participantCity: m.city,
+                _participantGender: m.gender,
+                _participantBio: m.bio,
+                _devfolioProfile: m.devfolioProfile,
+                _checkedIn: m.checkedIn,
+                _isRsvp: m.isRsvp,
+                _github: m.github,
+                _linkedin: m.linkedin,
+                _resume: m.resume,
+                _role: "Member",
+                _teamId: team._id,
+                _memberIndex: i,
+            })),
         ])
         : [];
 
@@ -106,25 +152,17 @@ export default function RegistrationsPage() {
                             placeholder="Search by name, email, or team name..."
                         />
                     </div>
-                    <select value={filters.batch} onChange={(e) => handleFilterChange("batch", e.target.value)} className="select-olympus">
-                        <option value="">All Batches</option>
-                        <option value="2025">2025</option>
-                        <option value="2026">2026</option>
-                        <option value="2027">2027</option>
-                        <option value="2028">2028</option>
-                        <option value="2024">2024</option>
+                    <select value={filters.college} onChange={(e) => handleFilterChange("college", e.target.value)} className="select-olympus">
+                        <option value="">All Colleges</option>
+                        {[...allColleges].sort().map(c => (
+                            <option key={c} value={c}>{c}</option>
+                        ))}
                     </select>
-                    <select value={filters.course} onChange={(e) => handleFilterChange("course", e.target.value)} className="select-olympus">
-                        <option value="">All Courses</option>
-                        <option value="BTech">BTech</option>
-                        <option value="BCA">BCA</option>
-                        <option value="BDes">BDes</option>
-                        <option value="HSB">HSB</option>
-                    </select>
-                    <select value={filters.memberType} onChange={(e) => handleFilterChange("memberType", e.target.value)} className="select-olympus">
-                        <option value="">All Types</option>
-                        <option value="hosteller">Hosteller</option>
-                        <option value="dayScholar">Day Scholar</option>
+                    <select value={filters.city} onChange={(e) => handleFilterChange("city", e.target.value)} className="select-olympus">
+                        <option value="">All Cities</option>
+                        {[...allCities].sort().map(c => (
+                            <option key={c} value={c}>{c}</option>
+                        ))}
                     </select>
                     <select value={filters.checkedIn} onChange={(e) => handleFilterChange("checkedIn", e.target.value)} className="select-olympus">
                         <option value="">Check-in Status</option>
@@ -167,6 +205,7 @@ export default function RegistrationsPage() {
                                             <span className={`badge px-3 ${team.status === 'complete' ? 'badge-success' : team.status === 'disqualified' ? 'badge-danger' : 'badge-muted'}`}>
                                                 {team.status}
                                             </span>
+                                            {team.teamFullyRsvp && <span className="badge px-3 badge-success">RSVP ✓</span>}
                                         </div>
                                         {team.roomNumber && <p className="text-xs mt-2 font-bold tracking-widest uppercase" style={{ color: "var(--accent-amber)" }}>Room: {team.roomNumber}</p>}
                                     </div>
@@ -179,10 +218,10 @@ export default function RegistrationsPage() {
                                                 <th>Role</th>
                                                 <th>Name</th>
                                                 <th>Email</th>
-                                                <th>Phone</th>
-                                                <th>Batch</th>
-                                                <th>Course</th>
-                                                <th>Type</th>
+                                                <th>College</th>
+                                                <th>City</th>
+                                                <th>Gender</th>
+                                                <th>RSVP</th>
                                                 <th>Links</th>
                                                 <th>Check-in</th>
                                             </tr>
@@ -192,11 +231,16 @@ export default function RegistrationsPage() {
                                                 <td><span className="badge badge-gold">Leader</span></td>
                                                 <td style={{ color: "var(--text-primary)", fontWeight: 500 }}>{team.leaderName}</td>
                                                 <td>{team.leaderEmail}</td>
-                                                <td>{team.leaderPhone}</td>
-                                                <td>{team.leaderBatch}</td>
-                                                <td>{team.leaderCourse}</td>
-                                                <td><span className={`badge ${team.leaderType === 'hosteller' ? 'badge-success' : 'badge-muted'}`}>{team.leaderType}</span></td>
+                                                <td>{team.leaderCollege || '—'}</td>
+                                                <td>{team.leaderCity || '—'}</td>
+                                                <td>{team.leaderGender || '—'}</td>
+                                                <td>
+                                                    <span className={`badge ${team.leaderIsRsvp ? 'badge-success' : 'badge-muted'}`}>
+                                                        {team.leaderIsRsvp ? 'Yes' : 'No'}
+                                                    </span>
+                                                </td>
                                                 <td className="flex gap-3 text-lg">
+                                                    {team.devfolioProfile && <a href={`https://devfolio.co/@${team.devfolioProfile}`} target="_blank" title="Devfolio" className="text-blue-400 hover:text-blue-300 transition-colors"><ExternalLink size={18} /></a>}
                                                     {team.leaderGithub && <a href={team.leaderGithub} target="_blank" title="GitHub" className="text-gray-400 hover:text-white transition-colors"><Github size={18} /></a>}
                                                     {team.leaderLinkedin && <a href={team.leaderLinkedin} target="_blank" title="LinkedIn" className="text-gray-400 hover:text-white transition-colors"><Linkedin size={18} /></a>}
                                                     {team.leaderResume && <a href={team.leaderResume} target="_blank" title="Resume" className="text-gold hover:text-yellow-300 transition-colors"><FileText size={18} /></a>}
@@ -215,11 +259,16 @@ export default function RegistrationsPage() {
                                                     <td><span className="badge badge-muted">Member</span></td>
                                                     <td style={{ color: "var(--text-primary)" }}>{member.name}</td>
                                                     <td>{member.email}</td>
-                                                    <td>{member.phone}</td>
-                                                    <td>{member.batch}</td>
-                                                    <td>{member.course}</td>
-                                                    <td><span className={`badge ${member.memberType === 'hosteller' ? 'badge-success' : 'badge-muted'}`}>{member.memberType}</span></td>
+                                                    <td>{member.college || '—'}</td>
+                                                    <td>{member.city || '—'}</td>
+                                                    <td>{member.gender || '—'}</td>
+                                                    <td>
+                                                        <span className={`badge ${member.isRsvp ? 'badge-success' : 'badge-muted'}`}>
+                                                            {member.isRsvp ? 'Yes' : 'No'}
+                                                        </span>
+                                                    </td>
                                                     <td className="flex gap-3 text-lg">
+                                                        {member.devfolioProfile && <a href={`https://devfolio.co/@${member.devfolioProfile}`} target="_blank" title="Devfolio" className="text-blue-400 hover:text-blue-300 transition-colors"><ExternalLink size={18} /></a>}
                                                         {member.github && <a href={member.github} target="_blank" title="GitHub" className="text-gray-400 hover:text-white transition-colors"><Github size={18} /></a>}
                                                         {member.linkedin && <a href={member.linkedin} target="_blank" title="LinkedIn" className="text-gray-400 hover:text-white transition-colors"><Linkedin size={18} /></a>}
                                                         {member.resume && <a href={member.resume} target="_blank" title="Resume" className="text-gold hover:text-yellow-300 transition-colors"><FileText size={18} /></a>}
@@ -252,10 +301,10 @@ export default function RegistrationsPage() {
                                     <th>Role</th>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Batch</th>
-                                    <th>Course</th>
-                                    <th>Type</th>
+                                    <th>College</th>
+                                    <th>City</th>
+                                    <th>Gender</th>
+                                    <th>RSVP</th>
                                     <th>Links</th>
                                     <th>Check-in</th>
                                 </tr>
@@ -263,7 +312,7 @@ export default function RegistrationsPage() {
                             <tbody>
                                 {participants.length === 0 ? (
                                     <tr>
-                                        <td colSpan={9} className="text-center py-8" style={{ color: "var(--text-muted)" }}>
+                                        <td colSpan={10} className="text-center py-8" style={{ color: "var(--text-muted)" }}>
                                             No participants found
                                         </td>
                                     </tr>
@@ -274,11 +323,16 @@ export default function RegistrationsPage() {
                                             <td><span className={`badge ${p._role === 'Leader' ? 'badge-gold' : 'badge-muted'}`}>{p._role}</span></td>
                                             <td style={{ color: "var(--text-primary)" }}>{p._participantName}</td>
                                             <td>{p._participantEmail}</td>
-                                            <td>{p._participantPhone}</td>
-                                            <td>{p._participantBatch}</td>
-                                            <td>{p._participantCourse}</td>
-                                            <td><span className={`badge ${p._participantType === 'hosteller' ? 'badge-success' : 'badge-muted'}`}>{p._participantType}</span></td>
+                                            <td>{p._participantCollege || '—'}</td>
+                                            <td>{p._participantCity || '—'}</td>
+                                            <td>{p._participantGender || '—'}</td>
+                                            <td>
+                                                <span className={`badge ${p._isRsvp ? 'badge-success' : 'badge-muted'}`}>
+                                                    {p._isRsvp ? 'Yes' : 'No'}
+                                                </span>
+                                            </td>
                                             <td className="flex gap-3 text-lg">
+                                                {p._devfolioProfile && <a href={`https://devfolio.co/@${p._devfolioProfile}`} target="_blank" title="Devfolio" className="text-blue-400 hover:text-blue-300 transition-colors"><ExternalLink size={18} /></a>}
                                                 {p._github && <a href={p._github} target="_blank" title="GitHub" className="text-gray-400 hover:text-white transition-colors"><Github size={18} /></a>}
                                                 {p._linkedin && <a href={p._linkedin} target="_blank" title="LinkedIn" className="text-gray-400 hover:text-white transition-colors"><Linkedin size={18} /></a>}
                                                 {p._resume && <a href={p._resume} target="_blank" title="Resume" className="text-gold hover:text-yellow-300 transition-colors"><FileText size={18} /></a>}

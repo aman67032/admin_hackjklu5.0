@@ -8,15 +8,13 @@ const exportTemplates = [
     { id: "complete-teams", label: "Complete Teams", description: "Only teams marked as complete", icon: "✅", endpoint: "teams", params: { status: "complete" } },
     { id: "checked-in", label: "Checked-in Participants", description: "All participants who have checked in", icon: "🏛️", endpoint: "participants", params: { checkedIn: "true" } },
     { id: "not-checked-in", label: "Not Checked-in", description: "Participants yet to check in", icon: "❌", endpoint: "participants", params: { checkedIn: "false" } },
-    { id: "hostellers", label: "Hostellers", description: "All hosteller participants", icon: "🏠", endpoint: "participants", params: { memberType: "hosteller" } },
-    { id: "day-scholars", label: "Day Scholars", description: "All day scholar participants", icon: "🌞", endpoint: "participants", params: { memberType: "dayScholar" } },
     { id: "mess-food", label: "Mess Food Opted", description: "Participants who opted for mess food", icon: "🍽️", endpoint: "participants", params: { messFood: "true" } },
     { id: "all-participants", label: "All Participants (Individual)", description: "Every participant as individual rows", icon: "👤", endpoint: "participants", params: {} },
 ];
 
 export default function ExportsPage() {
     const [downloading, setDownloading] = useState<string | null>(null);
-    const [customFilters, setCustomFilters] = useState({ batch: "", course: "", checkedIn: "", memberType: "", messFood: "" });
+    const [customFilters, setCustomFilters] = useState({ checkedIn: "", messFood: "" });
 
     const handleExport = async (id: string, endpoint: string, params: Record<string, string>) => {
         setDownloading(id);
@@ -114,39 +112,7 @@ export default function ExportsPage() {
                 <p className="text-sm mb-4 font-medium text-white" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
                     Apply filters and export matching participants as CSV
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
-                    <select
-                        value={customFilters.batch}
-                        onChange={(e) => setCustomFilters(prev => ({ ...prev, batch: e.target.value }))}
-                        className="select-olympus"
-                    >
-                        <option value="">All Batches</option>
-                        <option value="2025">2025</option>
-                        <option value="2026">2026</option>
-                        <option value="2027">2027</option>
-                        <option value="2028">2028</option>
-                        <option value="2024">2024</option>
-                    </select>
-                    <select
-                        value={customFilters.course}
-                        onChange={(e) => setCustomFilters(prev => ({ ...prev, course: e.target.value }))}
-                        className="select-olympus"
-                    >
-                        <option value="">All Courses</option>
-                        <option value="BTech">BTech</option>
-                        <option value="BCA">BCA</option>
-                        <option value="BDes">BDes</option>
-                        <option value="HSB">HSB</option>
-                    </select>
-                    <select
-                        value={customFilters.memberType}
-                        onChange={(e) => setCustomFilters(prev => ({ ...prev, memberType: e.target.value }))}
-                        className="select-olympus"
-                    >
-                        <option value="">All Types</option>
-                        <option value="hosteller">Hosteller</option>
-                        <option value="dayScholar">Day Scholar</option>
-                    </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                     <select
                         value={customFilters.checkedIn}
                         onChange={(e) => setCustomFilters(prev => ({ ...prev, checkedIn: e.target.value }))}

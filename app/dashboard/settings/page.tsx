@@ -90,7 +90,7 @@ export default function SettingsPage() {
                     college: getValue('college') || getValue('education'),
                     batch: getValue('batch'),
                     course: getValue('course'),
-                    type: getValue('type')?.toLowerCase().includes('hostell') ? 'hosteller' : 'dayScholar',
+
                     messFood: getValue('mess')?.toLowerCase() === 'true',
                     gender: getValue('gender'),
                     bio: getValue('bio'),
@@ -115,7 +115,7 @@ export default function SettingsPage() {
                         leaderCollege: participantData.college,
                         leaderBatch: participantData.batch,
                         leaderCourse: participantData.course,
-                        leaderType: participantData.type,
+
                         leaderMessFood: participantData.messFood,
                         leaderGender: participantData.gender,
                         leaderBio: participantData.bio,
@@ -133,7 +133,7 @@ export default function SettingsPage() {
                     const team = teamsMap.get(teamName);
                     team.members.push({
                         ...participantData,
-                        memberType: participantData.type // map to member schema property
+
                     });
                     if (team.members.length >= 2) team.status = 'complete'; // Rough estimate
                 }
