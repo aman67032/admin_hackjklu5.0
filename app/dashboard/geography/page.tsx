@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { MapPin, Users, ChevronDown, ChevronUp } from "lucide-react";
 import { geographyApi } from "@/lib/api";
 import STATE_PATHS from "./paths.json";
+import STATE_CENTERS from "./centers.json";
 
 // State ID to name mapping (matches SVG path IDs)
 const STATE_ID_MAP: Record<string, string> = {
@@ -155,18 +156,18 @@ export default function GeographyPage() {
                                         onMouseLeave={() => setHoveredState(null)}
                                         onClick={() => setSelectedState(isSelected ? null : stateId)}
                                     />
-                                    {count > 0 && (
+                                    {count > 0 && STATE_CENTERS[stateId as keyof typeof STATE_CENTERS] && (
                                         <text
-                                            x={getPathCenter(path).x}
-                                            y={getPathCenter(path).y}
+                                            x={(STATE_CENTERS as any)[stateId].x}
+                                            y={(STATE_CENTERS as any)[stateId].y}
                                             textAnchor="middle"
                                             dominantBaseline="central"
                                             style={{
-                                                fontSize: "11px",
+                                                fontSize: "16px",
                                                 fill: "white",
-                                                fontWeight: 700,
+                                                fontWeight: 800,
                                                 pointerEvents: "none",
-                                                textShadow: "0 1px 3px rgba(0,0,0,0.8)",
+                                                textShadow: "0 2px 6px rgba(0,0,0,0.9)",
                                             }}
                                         >
                                             {count}
@@ -299,14 +300,4 @@ export default function GeographyPage() {
     );
 }
 
-// Helper to compute center of an SVG path for label placement
-function getPathCenter(d: string): { x: number; y: number } {
-    const nums = d.match(/[\d.]+/g)?.map(Number) || [];
-    let sumX = 0, sumY = 0, count = 0;
-    for (let i = 0; i < nums.length - 1; i += 2) {
-        sumX += nums[i];
-        sumY += nums[i + 1];
-        count++;
-    }
-    return { x: count > 0 ? sumX / count : 0, y: count > 0 ? sumY / count : 0 };
-}
+// EOF
