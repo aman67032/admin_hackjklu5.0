@@ -139,6 +139,19 @@ export const exportsApi = {
     },
 };
 
+// Geography
+export const geographyApi = {
+    get: () =>
+        apiFetch<{
+            totalParticipants: number;
+            states: {
+                state: string;
+                count: number;
+                cities: { city: string; count: number }[];
+            }[];
+        }>('/geography'),
+};
+
 // Settings
 export const settingsApi = {
     get: () => apiFetch<any>('/settings'),
