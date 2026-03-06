@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { FastForward } from 'lucide-react';
 
 interface LoadingScreenProps {
     onComplete?: () => void;
@@ -14,17 +15,31 @@ export default function LoadingScreen({
 }: LoadingScreenProps) {
     const [isVisible, setIsVisible] = useState(true);
     const [isMounted, setIsMounted] = useState(false);
+    const [shouldPlay, setShouldPlay] = useState(false);
 
     useEffect(() => {
         setIsMounted(true);
-        const timer = setTimeout(() => {
-            setIsVisible(false);
-            setTimeout(() => onComplete?.(), 500);
-        }, duration);
-        return () => clearTimeout(timer);
+        const hasSeen = localStorage.getItem('hasSeenLoadingScreen');
+        if (hasSeen) {
+            setShouldPlay(false);
+            if (onComplete) onComplete();
+        } else {
+            setShouldPlay(true);
+            localStorage.setItem('hasSeenLoadingScreen', 'true');
+            const timer = setTimeout(() => {
+                setIsVisible(false);
+                setTimeout(() => onComplete?.(), 500);
+            }, duration);
+            return () => clearTimeout(timer);
+        }
     }, [duration, onComplete]);
 
-    if (!isMounted) return null;
+    const handleSkip = () => {
+        setIsVisible(false);
+        setTimeout(() => onComplete?.(), 300);
+    };
+
+    if (!isMounted || !shouldPlay) return null;
 
     // Timeline:
     // 0s - 3.5s: Owl Construction (Draws)
@@ -590,6 +605,18 @@ export default function LoadingScreen({
                             />
                         ))}
                     </div>
+
+                    {/* Skip Button */}
+                    <motion.button
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 2, duration: 1 }}
+                        onClick={handleSkip}
+                        className="absolute bottom-8 right-8 flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 hover:text-white/80 transition-all text-sm font-medium tracking-wide backdrop-blur-sm z-50 group cursor-pointer"
+                    >
+                        <span>Skip intro</span>
+                        <FastForward size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                    </motion.button>
                 </motion.div>
             )}
         </AnimatePresence>
