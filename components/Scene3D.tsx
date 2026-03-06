@@ -55,7 +55,7 @@ function SacredFlame({ position }: { position: [number, number, number] }) {
     );
 }
 
-// AI Generated Olympian Power Core
+
 function OrbModel() {
     const { scene } = useGLTF('/3d/orb(option2).glb');
     const orbRef = useRef<THREE.Group>(null!);
@@ -73,18 +73,13 @@ function OrbModel() {
                     roughness: 0.05,
                     ior: 1.5,
                     thickness: 2,
-                    emissive: '#d99b68',
-                    emissiveIntensity: 0.1 // Much lower emission to prevent whitening
+                    emissive: '#27a792ff',
+                    emissiveIntensity: 0.3 // Much lower emission to prevent whitening
                 });
             }
         });
     }, [scene]);
 
-    useFrame(() => {
-        if (orbRef.current) {
-            orbRef.current.rotation.y += 0.005; // Auto-rotate the rings
-        }
-    });
 
     return (
         <Float speed={2.5} rotationIntensity={0.8} floatIntensity={1.5}>

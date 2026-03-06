@@ -3,20 +3,23 @@
 import { useEffect, useState } from "react";
 import { MapPin, Users, ChevronDown, ChevronUp } from "lucide-react";
 import { geographyApi } from "@/lib/api";
+import STATE_PATHS from "./paths.json";
 
 // State ID to name mapping (matches SVG path IDs)
 const STATE_ID_MAP: Record<string, string> = {
-    "IN-AP": "Andhra Pradesh", "IN-AR": "Arunachal Pradesh", "IN-AS": "Assam",
-    "IN-BR": "Bihar", "IN-CT": "Chhattisgarh", "IN-GA": "Goa",
-    "IN-GJ": "Gujarat", "IN-HR": "Haryana", "IN-HP": "Himachal Pradesh",
-    "IN-JH": "Jharkhand", "IN-KA": "Karnataka", "IN-KL": "Kerala",
-    "IN-MP": "Madhya Pradesh", "IN-MH": "Maharashtra", "IN-MN": "Manipur",
-    "IN-ML": "Meghalaya", "IN-MZ": "Mizoram", "IN-NL": "Nagaland",
-    "IN-OR": "Odisha", "IN-PB": "Punjab", "IN-RJ": "Rajasthan",
-    "IN-SK": "Sikkim", "IN-TN": "Tamil Nadu", "IN-TG": "Telangana",
-    "IN-TR": "Tripura", "IN-UP": "Uttar Pradesh", "IN-UT": "Uttarakhand",
-    "IN-WB": "West Bengal", "IN-DL": "Delhi", "IN-JK": "Jammu & Kashmir",
-    "IN-LA": "Ladakh",
+    "INAP": "Andhra Pradesh", "INAR": "Arunachal Pradesh", "INAS": "Assam",
+    "INBR": "Bihar", "INCT": "Chhattisgarh", "INGA": "Goa",
+    "INGJ": "Gujarat", "INHR": "Haryana", "INHP": "Himachal Pradesh",
+    "INJH": "Jharkhand", "INKA": "Karnataka", "INKL": "Kerala",
+    "INMP": "Madhya Pradesh", "INMH": "Maharashtra", "INMN": "Manipur",
+    "INML": "Meghalaya", "INMZ": "Mizoram", "INNL": "Nagaland",
+    "INOR": "Odisha", "INPB": "Punjab", "INRJ": "Rajasthan",
+    "INSK": "Sikkim", "INTN": "Tamil Nadu", "INTG": "Telangana",
+    "INTR": "Tripura", "INUP": "Uttar Pradesh", "INUT": "Uttarakhand",
+    "INWB": "West Bengal", "INDL": "Delhi", "INJK": "Jammu & Kashmir",
+    "INLA": "Ladakh", "INAN": "Andaman & Nicobar", "INCH": "Chandigarh",
+    "INDH": "Dadra & Nagar Haveli", "INDD": "Daman & Diu", "INLD": "Lakshadweep",
+    "INPY": "Puducherry"
 };
 
 // Reverse map: state name -> state ID
@@ -30,39 +33,7 @@ interface StateData {
 }
 
 // Simplified India SVG state paths (viewBox: 0 0 800 900)
-const STATE_PATHS: Record<string, string> = {
-    "IN-JK": "M 220 30 L 260 20 L 300 40 L 310 80 L 280 110 L 250 100 L 230 70 Z",
-    "IN-LA": "M 310 20 L 350 10 L 380 30 L 370 70 L 340 80 L 310 60 Z",
-    "IN-HP": "M 280 110 L 310 100 L 330 120 L 320 150 L 290 140 L 270 130 Z",
-    "IN-PB": "M 240 130 L 270 120 L 290 140 L 280 170 L 250 165 L 235 150 Z",
-    "IN-UT": "M 320 120 L 360 110 L 380 130 L 370 170 L 340 180 L 310 160 Z",
-    "IN-HR": "M 250 165 L 280 160 L 300 180 L 290 210 L 260 205 L 245 185 Z",
-    "IN-DL": "M 272 195 L 285 190 L 290 200 L 282 210 L 270 205 Z",
-    "IN-RJ": "M 140 195 L 240 180 L 260 210 L 270 280 L 230 330 L 160 320 L 120 270 L 110 230 Z",
-    "IN-UP": "M 290 180 L 370 170 L 440 190 L 460 230 L 430 270 L 370 280 L 310 270 L 280 240 L 270 210 Z",
-    "IN-BR": "M 460 230 L 530 220 L 560 250 L 540 280 L 490 290 L 460 270 Z",
-    "IN-SK": "M 540 200 L 560 195 L 570 210 L 560 220 L 545 215 Z",
-    "IN-AR": "M 620 180 L 680 170 L 710 195 L 690 220 L 640 215 L 615 200 Z",
-    "IN-NL": "M 680 220 L 710 215 L 720 240 L 700 255 L 680 245 Z",
-    "IN-MN": "M 680 255 L 710 250 L 720 280 L 700 295 L 675 280 Z",
-    "IN-MZ": "M 665 295 L 695 290 L 710 320 L 690 345 L 665 330 Z",
-    "IN-TR": "M 630 305 L 660 300 L 665 325 L 645 335 L 625 320 Z",
-    "IN-ML": "M 580 250 L 630 240 L 650 260 L 630 275 L 590 270 Z",
-    "IN-AS": "M 560 220 L 620 200 L 680 215 L 670 250 L 580 260 L 555 240 Z",
-    "IN-WB": "M 490 280 L 540 270 L 570 300 L 560 380 L 530 400 L 500 370 L 480 320 Z",
-    "IN-JH": "M 430 270 L 490 260 L 500 300 L 480 330 L 440 320 L 420 290 Z",
-    "IN-OR": "M 400 320 L 480 310 L 510 350 L 500 410 L 440 430 L 390 400 L 380 360 Z",
-    "IN-CT": "M 340 320 L 400 300 L 420 340 L 400 400 L 360 420 L 330 380 Z",
-    "IN-MP": "M 200 260 L 310 240 L 370 260 L 380 320 L 340 340 L 280 350 L 210 330 L 180 290 Z",
-    "IN-GJ": "M 70 260 L 150 250 L 200 280 L 210 340 L 170 380 L 120 400 L 80 370 L 50 320 Z",
-    "IN-MH": "M 120 380 L 210 340 L 290 370 L 340 420 L 310 490 L 240 510 L 170 480 L 130 440 Z",
-    "IN-TG": "M 300 420 L 380 400 L 420 440 L 400 500 L 340 510 L 290 480 Z",
-    "IN-AP": "M 340 470 L 420 440 L 460 490 L 440 560 L 380 580 L 330 540 Z",
-    "IN-KA": "M 170 470 L 250 450 L 310 490 L 330 560 L 290 620 L 220 630 L 170 580 L 150 520 Z",
-    "IN-GA": "M 150 490 L 175 475 L 185 500 L 170 520 L 148 510 Z",
-    "IN-KL": "M 210 600 L 250 580 L 280 630 L 270 700 L 240 730 L 210 710 L 200 650 Z",
-    "IN-TN": "M 280 570 L 380 540 L 420 590 L 400 670 L 340 720 L 280 700 L 260 640 Z",
-};
+// Now using STATE_PATHS from paths.json
 
 function getColor(count: number, maxCount: number): string {
     if (count === 0 || maxCount === 0) return "rgba(255, 255, 255, 0.05)";
@@ -161,7 +132,7 @@ export default function GeographyPage() {
                         borderColor: "rgba(232, 98, 26, 0.25)",
                         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
                     }}>
-                    <svg viewBox="0 0 800 780" className="w-full h-auto" style={{ maxHeight: "70vh" }}>
+                    <svg viewBox="0 0 1000 1000" className="w-full h-auto" style={{ maxHeight: "70vh" }}>
                         {Object.entries(STATE_PATHS).map(([stateId, path]) => {
                             const count = getStateCount(stateId);
                             const stateName = STATE_ID_MAP[stateId] || stateId;
