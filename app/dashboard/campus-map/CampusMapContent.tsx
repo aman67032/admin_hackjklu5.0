@@ -66,6 +66,7 @@ export default function CampusMapContent() {
     const [availableFloors, setAvailableFloors] = useState<string[]>([]);
     const zonesLayerRef = useRef<L.FeatureGroup | null>(null);
     const [isLoadingZones, setIsLoadingZones] = useState(false);
+    const [highlightedAreaId, setHighlightedAreaId] = useState<string | null>(null);
 
     // Filter areas by search
     const filteredAreas = campusAreas.filter(
@@ -131,11 +132,12 @@ export default function CampusMapContent() {
 
             if (area.type === "polygon") {
                 const polygon = L.polygon(area.coordinates, {
-                    color: area.color,
-                    weight: 2,
+                    color: area.id === highlightedAreaId ? "#ffffff" : area.color,
+                    weight: area.id === highlightedAreaId ? 4 : 2,
                     opacity: 0.85,
-                    fillColor: area.fillColor,
-                    fillOpacity: 0.3,
+                    fillColor: area.id === highlightedAreaId ? "#ffffff" : area.fillColor,
+                    fillOpacity: area.id === highlightedAreaId ? 0.6 : 0.3,
+                    className: area.id === highlightedAreaId ? "searching-highlight-pulse" : ""
                 }).addTo(map);
 
                 polygon.bindPopup(
@@ -420,8 +422,8 @@ export default function CampusMapContent() {
             },
             {
                 enableHighAccuracy: true,
-                timeout: 20000, // Increased timeout to 20s for mobile GPS to get a lock
-                maximumAge: 5000, // Allow up to 5 seconds old cached position
+                timeout: 10000,
+                maximumAge: 1000,
             }
         );
 
@@ -449,7 +451,13 @@ export default function CampusMapContent() {
             const centLng = area.coordinates.reduce((s, c) => s + c[1], 0) / area.coordinates.length;
             mapRef.current.flyTo([centLat, centLng], 19, { duration: 1 });
             setSelectedArea(area);
+            setHighlightedAreaId(area.id);
             setShowSearch(false);
+
+            // Clear highlight after 5 seconds
+            setTimeout(() => {
+                setHighlightedAreaId(null);
+            }, 5000);
         }
     }, []);
 
@@ -543,6 +551,21 @@ export default function CampusMapContent() {
         @keyframes pulse-ring {
           0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
           100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+        }
+
+        .user-location-marker, .accuracy-circle {
+          transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), left 0.8s cubic-bezier(0.4, 0, 0.2, 1), top 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .searching-highlight-pulse {
+          animation: searching-glow 1.5s ease-in-out infinite;
+          z-index: 1000 !important;
+        }
+
+        @keyframes searching-glow {
+          0% { stroke-width: 4; fill-opacity: 0.3; stroke-opacity: 0.8; }
+          50% { stroke-width: 8; fill-opacity: 0.7; stroke-opacity: 1; }
+          100% { stroke-width: 4; fill-opacity: 0.3; stroke-opacity: 0.8; }
         }
 
         .leaflet-control-zoom a {

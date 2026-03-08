@@ -272,8 +272,23 @@ export default function CampusMapEditorContent() {
     return (
         <div className="relative w-full overflow-hidden" style={{ height: "100vh", background: "#0a0a0f" }}>
             <style jsx global>{`
-                .leaflet-draw-toolbar a { background-color: rgba(20,20,30,0.9) !important; color: #fff !important; border-color: rgba(255,167,38,0.3) !important; }
-                .leaflet-draw-toolbar a:hover { background-color: rgba(255,167,38,0.2) !important; }
+                .leaflet-draw-toolbar a { 
+                    background-color: #1a1a24 !important; 
+                    color: #ffa726 !important; 
+                    border: 1px solid rgba(255,167,38,0.4) !important;
+                    width: 34px !important;
+                    height: 34px !important;
+                    line-height: 34px !important;
+                }
+                .leaflet-draw-toolbar a:hover { 
+                    background-color: rgba(255,167,38,0.2) !important; 
+                    color: #fff !important;
+                }
+                .leaflet-draw-actions a {
+                    background-color: #1a1a24 !important;
+                    color: #fff !important;
+                    border: 1px solid rgba(255,167,38,0.2) !important;
+                }
                 .zone-tooltip { background: transparent; border: none; box-shadow: none; color: white; font-weight: bold; text-shadow: 0px 1px 3px black; font-family: Inter; font-size: 11px;}
                 .leaflet-control-zoom a { background: rgba(20, 20, 30, 0.9) !important; color: #ffa726 !important; border-color: rgba(255, 167, 38, 0.3) !important; }
             `}</style>
@@ -294,6 +309,32 @@ export default function CampusMapEditorContent() {
                     <span className="text-sm font-bold text-white tracking-wide">Map Floor Builder</span>
                 </div>
             </div>
+
+            {/* ── Instructions Overlay ────────────────────────────── */}
+            {!showForm && (
+                <div className="absolute bottom-10 left-4 md:left-[17rem] z-[1000] max-w-xs animate-in slide-in-from-bottom-5 duration-500">
+                    <div className="bg-[#121217]/90 backdrop-blur-md border border-orange-500/20 rounded-2xl p-4 shadow-2xl">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Plus size={16} className="text-orange-400" />
+                            <span className="text-xs font-bold text-white uppercase tracking-wider">Quick Start</span>
+                        </div>
+                        <ul className="space-y-2">
+                            <li className="text-[11px] text-gray-400 flex gap-2">
+                                <span className="text-orange-400 font-bold">1.</span>
+                                <span>Use the <Edit3 size={10} className="inline" /> icon top-right to start drawing a polygon.</span>
+                            </li>
+                            <li className="text-[11px] text-gray-400 flex gap-2">
+                                <span className="text-orange-400 font-bold">2.</span>
+                                <span>Trace the floor area over a building.</span>
+                            </li>
+                            <li className="text-[11px] text-gray-400 flex gap-2">
+                                <span className="text-orange-400 font-bold">3.</span>
+                                <span>Fill in the zone name, floor, and venue type.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            )}
 
             {/* ── Floor Selector Control ────────────────────────────── */}
             <div className="absolute top-20 right-4 z-[1000] mt-16 md:mt-0 bg-[#121217] rounded-xl border border-white/10 p-2 shadow-2xl flex flex-col gap-1 w-14">

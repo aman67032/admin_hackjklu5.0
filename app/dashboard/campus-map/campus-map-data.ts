@@ -158,6 +158,22 @@ export const campusAreas: CampusArea[] = [
         category: 'academic',
         icon: '⚙️',
     },
+    {
+        id: 'iet-amphitheatre',
+        name: 'IET Amphitheatre',
+        description: 'Open amphitheatre located within the IET-1 ground area. Popular for small gatherings and student activities.',
+        color: '#9c27b0',
+        fillColor: '#9c27b0',
+        coordinates: [
+            [26.83585, 75.65005],
+            [26.83590, 75.65010],
+            [26.83595, 75.65005],
+            [26.83590, 75.65000],
+        ],
+        type: 'polygon',
+        category: 'landmark',
+        icon: '🎭',
+    },
 
     {
         id: 'im-hsb',
@@ -196,6 +212,22 @@ export const campusAreas: CampusArea[] = [
         type: 'polygon',
         category: 'academic',
         icon: '📊',
+    },
+    {
+        id: 'im-amphitheatre',
+        name: 'IM Amphitheatre',
+        description: 'Outdoor seating and performance area near the Institute of Management.',
+        color: '#fbc02d',
+        fillColor: '#fbc02d',
+        coordinates: [
+            [26.83640, 75.65020],
+            [26.83645, 75.65025],
+            [26.83650, 75.65020],
+            [26.83645, 75.65015],
+        ],
+        type: 'polygon',
+        category: 'landmark',
+        icon: '🎭',
     },
 
     {
