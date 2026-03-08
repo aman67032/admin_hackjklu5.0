@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Zap, ScrollText, Shield, Landmark, ClipboardList, Settings } from "lucide-react";
+import { Zap, ScrollText, Shield, Landmark, ClipboardList, Settings, MapPin } from "lucide-react";
 
 const navItems = [
     { href: "/dashboard", icon: <Zap size={18} />, label: "Overview", greekName: "Olympus" },
@@ -11,6 +11,7 @@ const navItems = [
     { href: "/dashboard/teams", icon: <Shield size={18} />, label: "Teams", greekName: "Armies" },
     { href: "/dashboard/checkin", icon: <Landmark size={18} />, label: "Check-in", greekName: "The Gates" },
     { href: "/dashboard/exports", icon: <ClipboardList size={18} />, label: "Exports", greekName: "Scrolls" },
+    { href: "/dashboard/map-builder", icon: <MapPin size={18} />, label: "Map Builder", greekName: "Architect" },
     { href: "/dashboard/settings", icon: <Settings size={18} />, label: "Settings", greekName: "Oracle" },
 ];
 

@@ -4,7 +4,9 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { campusAreas, CAMPUS_CENTER, CAMPUS_ZOOM, categoryColors, CampusArea } from "./campus-map-data";
-import { MapPin, Navigation, Search, ChevronDown, ChevronUp, Layers, X, Locate, Info } from "lucide-react";
+import { MapPin, Navigation, Search, ChevronDown, ChevronUp, Layers, X, Locate, Info, Loader2 } from "lucide-react";
+import { mapZonesApi } from "@/lib/api";
+import { CustomFloorZone, ZONE_TYPE_COLORS } from "../map-builder/map-builder-data";
 
 // Point-in-polygon ray casting
 function isPointInPolygon(point: [number, number], polygon: [number, number][]): boolean {
@@ -57,6 +59,13 @@ export default function CampusMapContent() {
     const [showSearch, setShowSearch] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
     const [trackingActive, setTrackingActive] = useState(false);
+
+    // Custom Zones & Floors
+    const [customZones, setCustomZones] = useState<CustomFloorZone[]>([]);
+    const [selectedFloor, setSelectedFloor] = useState<string>("Ground");
+    const [availableFloors, setAvailableFloors] = useState<string[]>([]);
+    const zonesLayerRef = useRef<L.FeatureGroup | null>(null);
+    const [isLoadingZones, setIsLoadingZones] = useState(false);
 
     // Filter areas by search
     const filteredAreas = campusAreas.filter(
@@ -180,11 +189,94 @@ export default function CampusMapContent() {
 
         mapRef.current = map;
 
+        // Create a layer group for custom zones
+        zonesLayerRef.current = L.featureGroup().addTo(map);
+
         return () => {
             map.remove();
             mapRef.current = null;
+            zonesLayerRef.current = null;
         };
     }, []);
+
+    // Load custom zones from backend
+    useEffect(() => {
+        const fetchZones = async () => {
+            setIsLoadingZones(true);
+            try {
+                const data = await mapZonesApi.get();
+                setCustomZones(data);
+            } catch (error) {
+                console.error("Failed to fetch custom zones:", error);
+            } finally {
+                setIsLoadingZones(false);
+            }
+        };
+        fetchZones();
+    }, []);
+
+    // Effect: Update available floors based on selected area
+    useEffect(() => {
+        if (!selectedArea) {
+            setAvailableFloors([]);
+            return;
+        }
+
+        const relatedZones = customZones.filter(z => z.parentBuildingId === selectedArea.id);
+        const floors = Array.from(new Set(relatedZones.map(z => z.floorLevel))).sort();
+
+        // Ensure "Ground" is always an option if there are any zones
+        if (floors.length > 0 && !floors.includes("Ground")) {
+            // Check if any zone is actually on ground
+            // If not, we still might want to show it as base
+        }
+
+        setAvailableFloors(floors);
+
+        // Default to Ground if available, else first available
+        if (floors.length > 0) {
+            if (floors.includes("Ground")) {
+                setSelectedFloor("Ground");
+            } else {
+                setSelectedFloor(floors[0]);
+            }
+        }
+    }, [selectedArea, customZones]);
+
+    // Effect: Render custom zones on the map
+    useEffect(() => {
+        if (!zonesLayerRef.current || !mapRef.current) return;
+
+        zonesLayerRef.current.clearLayers();
+
+        // Filter zones by current floor and selected building
+        const activeZones = customZones.filter(z =>
+            z.floorLevel === selectedFloor &&
+            (!selectedArea || z.parentBuildingId === selectedArea.id)
+        );
+
+        activeZones.forEach(zone => {
+            const polygon = L.polygon(zone.coordinates, {
+                color: zone.color,
+                fillColor: zone.fillColor,
+                weight: 2,
+                opacity: 0.9,
+                fillOpacity: 0.5,
+                dashArray: zone.zoneType === 'Restricted Area' ? '5, 5' : undefined
+            });
+
+            polygon.bindPopup(`
+                <div style="font-family:Inter,sans-serif;min-width:150px;">
+                    <div style="font-weight:700;font-size:13px;color:#fff;margin-bottom:2px;">${zone.name}</div>
+                    <div style="font-size:10px;color:${zone.color};font-weight:bold;text-transform:uppercase;margin-bottom:4px;">${zone.zoneType}</div>
+                    <div style="font-size:11px;color:#b0b0b0;line-height:1.3;">${zone.description || 'No description available.'}</div>
+                    <div style="font-size:10px;color:#666;margin-top:4px;">Floor: ${zone.floorLevel}</div>
+                </div>
+            `, { className: "campus-popup" });
+
+            zonesLayerRef.current?.addLayer(polygon);
+        });
+    }, [customZones, selectedFloor, selectedArea]);
 
     // Start/Stop location tracking
     const toggleTracking = useCallback(() => {
@@ -708,7 +800,26 @@ export default function CampusMapContent() {
                     </div>
                     <div className="p-3">
                         <p className="text-xs text-gray-400 leading-relaxed max-h-32 overflow-y-auto">{selectedArea.description}</p>
-                        <div className="flex items-center gap-2 mt-3">
+
+                        {/* Floor Switcher */}
+                        {availableFloors.length > 0 && (
+                            <div className="mt-4 pt-4 border-t border-white/5">
+                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Available Floors</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {availableFloors.map(floor => (
+                                        <button
+                                            key={floor}
+                                            onClick={() => setSelectedFloor(floor)}
+                                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${selectedFloor === floor ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                                        >
+                                            {floor}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-2 mt-4">
                             <div className="w-3 h-3 shrink-0 rounded-full" style={{ background: selectedArea.color }} />
                             <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold truncate">
                                 {categoryColors[selectedArea.category]?.label || selectedArea.category}

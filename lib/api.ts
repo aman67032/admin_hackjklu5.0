@@ -175,3 +175,12 @@ export function downloadCSV(csv: string, filename: string) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
+
+// Map Zones
+export const mapZonesApi = {
+    get: () => apiFetch<any[]>('/map-zones'),
+    sync: (zones: any[]) =>
+        apiFetch<any>('/map-zones/sync', { method: 'POST', body: JSON.stringify({ zones }) }),
+    delete: (id: string) =>
+        apiFetch<any>(`/map-zones/${id}`, { method: 'DELETE' }),
+};
