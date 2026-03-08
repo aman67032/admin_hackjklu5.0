@@ -154,7 +154,7 @@ export const campusAreas: CampusArea[] = [
             [26.83566888856953, 75.64985176248875],
             [26.83564103823138, 75.64986259027867],
         ],
-        type: 'line',
+        type: 'polygon',
         category: 'academic',
         icon: '⚙️',
     },
