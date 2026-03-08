@@ -70,9 +70,19 @@ export default function CampusMapContent() {
     useEffect(() => {
         if (!mapContainerRef.current || mapRef.current) return;
 
+        // Calculate limits
+        const boundary = campusAreas.find((a) => a.id === "campus-boundary");
+        let maxBounds: L.LatLngBounds | undefined;
+        if (boundary) {
+            maxBounds = L.latLngBounds(boundary.coordinates).pad(0.15); // Add 15% padding around limits
+        }
+
         const map = L.map(mapContainerRef.current, {
             center: CAMPUS_CENTER,
             zoom: CAMPUS_ZOOM,
+            minZoom: 16,        // Prevent zooming out too far
+            maxBounds: maxBounds,
+            maxBoundsViscosity: 1.0, // Solid wall against panning outside
             zoomControl: false,
             attributionControl: false,
         });
@@ -93,7 +103,6 @@ export default function CampusMapContent() {
             .addTo(map);
 
         // Draw campus boundary (acts as the base road/path network)
-        const boundary = campusAreas.find((a) => a.id === "campus-boundary");
         if (boundary) {
             L.polygon(boundary.coordinates, {
                 color: "#4a4a50", // Subtle border for the campus
@@ -594,7 +603,7 @@ export default function CampusMapContent() {
                     }}
                 >
                     <Navigation size={16} className={trackingActive ? "text-blue-400" : "text-gray-400"} />
-                    <span className={`text-xs font-semibold hidden md:inline-block ${trackingActive ? "text-blue-300" : "text-gray-300"}`}>
+                    <span className={`text-xs font-semibold ${trackingActive ? "text-blue-300" : "text-gray-300"}`}>
                         {trackingActive ? "Tracking ON" : "Track Me"}
                     </span>
                 </button>
@@ -611,7 +620,7 @@ export default function CampusMapContent() {
                         }}
                     >
                         <Locate size={16} className="text-gray-400" />
-                        <span className="text-xs font-semibold hidden md:inline-block text-gray-300">My Location</span>
+                        <span className="text-xs font-semibold text-gray-300">My Location</span>
                     </button>
                 )}
 
@@ -626,7 +635,7 @@ export default function CampusMapContent() {
                     }}
                 >
                     <MapPin size={16} className="text-gray-400" />
-                    <span className="text-xs font-semibold hidden md:inline-block text-gray-300">Reset View</span>
+                    <span className="text-xs font-semibold text-gray-300">Reset View</span>
                 </button>
             </div>
 
