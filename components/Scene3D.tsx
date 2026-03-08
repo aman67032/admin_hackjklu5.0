@@ -3,6 +3,7 @@
 import React, { useRef, useMemo, useEffect, useState, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Float } from '@react-three/drei';
+import { usePathname } from 'next/navigation';
 import * as THREE from 'three';
 
 function SacredFlame({ position }: { position: [number, number, number] }) {
@@ -73,7 +74,7 @@ function OrbModel() {
                     roughness: 0.05,
                     ior: 1.5,
                     thickness: 2,
-                    emissive: '#27a792ff',
+                    emissive: '#27a792',
                     emissiveIntensity: 0.3 // Much lower emission to prevent whitening
                 });
             }
@@ -237,7 +238,12 @@ function MeanderRing({ radius, color, speed, opacity = 0.3 }: { radius: number; 
 }
 
 export default function GreekScene() {
+    const pathname = usePathname();
     const [fov, setFov] = useState(40);
+
+    // Completely disable 3D background on Map Builder as it's full-screen 
+    // and causes performance/visibility conflicts.
+    if (pathname === '/dashboard/map-builder') return null;
 
     useEffect(() => {
         // Significantly increase FOV on smaller screens so the pillars still fit

@@ -54,6 +54,7 @@ export default function CampusMapEditorContent() {
             maxBounds = L.latLngBounds(boundary.coordinates).pad(0.15);
         }
 
+        console.log("Initializing Map Builder...");
         const map = L.map(mapContainerRef.current, {
             center: CAMPUS_CENTER,
             zoom: CAMPUS_ZOOM,
@@ -64,6 +65,7 @@ export default function CampusMapEditorContent() {
             zoomControl: false,
             attributionControl: false,
         });
+        console.log("Map instance created:", !!map);
 
         // Dark tile layer
         L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
@@ -85,6 +87,7 @@ export default function CampusMapEditorContent() {
             }).addTo(map);
         }
 
+        console.log(`Adding ${campusAreas.length} campus areas to map...`);
         for (const area of campusAreas) {
             if (area.id === "campus-boundary") continue;
             if (area.type === "polygon") {
@@ -105,6 +108,7 @@ export default function CampusMapEditorContent() {
                 }).openTooltip();
             }
         }
+        console.log("Campus areas added.");
 
         // Initialize Leaflet Draw Control
         // Must dynamically import leaflet-draw to avoid window errors
@@ -184,10 +188,12 @@ export default function CampusMapEditorContent() {
         }, 200);
 
         return () => {
-            map.remove();
-            mapRef.current = null;
+            if (mapRef.current) {
+                mapRef.current.remove();
+                mapRef.current = null;
+            }
         };
-    }, []);
+    }, [mounted]);
 
     // Effect: Draw saved zones onto the map
     useEffect(() => {
@@ -339,8 +345,8 @@ export default function CampusMapEditorContent() {
             {/* Map container */}
             <div
                 ref={mapContainerRef}
-                className="absolute inset-0 z-0"
-                style={{ width: '100%', height: '100%', background: '#0a0a0f' }}
+                className="absolute inset-0 z-20"
+                style={{ width: '100%', height: '100%', background: '#1a1a2e' }}
             />
 
             {/* ── Top Bar ────────────────────────────── */}
