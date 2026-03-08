@@ -202,7 +202,11 @@ export default function CampusMapContent() {
         }
 
         if (!navigator.geolocation) {
-            setLocationError("Geolocation is not supported by your browser");
+            setLocationError(
+                window.isSecureContext === false
+                    ? "Location requires a secure connection (HTTPS or localhost)."
+                    : "Geolocation is not supported by your browser."
+            );
             return;
         }
 
@@ -212,6 +216,7 @@ export default function CampusMapContent() {
         const watchId = navigator.geolocation.watchPosition(
             (position) => {
                 const { latitude, longitude, accuracy } = position.coords;
+                // ... same inside body
                 setUserLocation({ lat: latitude, lng: longitude, accuracy });
 
                 // Check if on campus
@@ -270,23 +275,23 @@ export default function CampusMapContent() {
             (error) => {
                 switch (error.code) {
                     case error.PERMISSION_DENIED:
-                        setLocationError("Location permission denied. Please enable location access.");
+                        setLocationError("Location permission denied. Please allow location access in your browser settings.");
                         break;
                     case error.POSITION_UNAVAILABLE:
-                        setLocationError("Location information unavailable.");
+                        setLocationError("Location information is currently unavailable.");
                         break;
                     case error.TIMEOUT:
-                        setLocationError("Location request timed out.");
+                        setLocationError("Location request timed out. Make sure you are under an open sky.");
                         break;
                     default:
-                        setLocationError("An unknown error occurred.");
+                        setLocationError("An unknown location error occurred.");
                 }
                 setTrackingActive(false);
             },
             {
                 enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0,
+                timeout: 20000, // Increased timeout to 20s for mobile GPS to get a lock
+                maximumAge: 5000, // Allow up to 5 seconds old cached position
             }
         );
 
