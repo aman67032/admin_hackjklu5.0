@@ -591,7 +591,7 @@ export default function CampusMapContent() {
             )}
 
             {/* ── Location Controls (bottom-left) ────────────────────────────── */}
-            <div className="absolute bottom-24 left-4 z-[1000] flex flex-col gap-2">
+            <div className="absolute bottom-32 md:bottom-28 left-4 z-[1000] flex flex-col gap-2">
                 {/* Track my location */}
                 <button
                     onClick={toggleTracking}
@@ -642,7 +642,7 @@ export default function CampusMapContent() {
             {/* ── Location Status Bar (bottom) ────────────────────────────── */}
             {(trackingActive || locationError) && (
                 <div
-                    className="absolute bottom-24 left-1/2 -translate-x-1/2 z-[1000] rounded-2xl px-4 py-3 max-w-md w-[calc(100vw-6rem)] md:w-[90vw]"
+                    className="absolute bottom-32 md:bottom-28 left-1/2 -translate-x-1/2 z-[1000] rounded-2xl px-4 py-3 max-w-md w-[calc(100vw-6rem)] md:w-[90vw]"
                     style={{
                         background: "rgba(10, 10, 18, 0.92)",
                         backdropFilter: "blur(20px)",
@@ -689,7 +689,7 @@ export default function CampusMapContent() {
             {/* ── Selected Area Info Panel ────────────────────────────── */}
             {selectedArea && (
                 <div
-                    className="absolute bottom-6 left-4 right-4 md:bottom-24 md:left-auto md:right-4 z-[1000] md:w-72 rounded-2xl overflow-hidden"
+                    className="absolute bottom-32 left-4 right-4 md:bottom-28 md:left-auto md:right-4 z-[1000] md:w-72 rounded-2xl overflow-hidden"
                     style={{
                         background: "rgba(10, 10, 18, 0.92)",
                         backdropFilter: "blur(20px)",
