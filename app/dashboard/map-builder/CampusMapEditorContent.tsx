@@ -13,6 +13,9 @@ import { mapZonesApi } from "@/lib/api";
 import { MapPin, Navigation, Save, Trash2, Edit3, Plus, X, Layers, AlertCircle, Loader2 } from "lucide-react";
 
 export default function CampusMapEditorContent() {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
+
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<L.Map | null>(null);
     const drawnItemsRef = useRef<L.FeatureGroup | null>(null);
@@ -269,6 +272,12 @@ export default function CampusMapEditorContent() {
     };
 
 
+    if (!mounted) return (
+        <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
+            <Loader2 className="animate-spin text-orange-500" size={48} />
+        </div>
+    );
+
     return (
         <div className="relative w-full overflow-hidden" style={{ height: "100vh", background: "#0a0a0f" }}>
             <style jsx global>{`
@@ -297,9 +306,9 @@ export default function CampusMapEditorContent() {
             <div ref={mapContainerRef} className="absolute inset-0 z-0 md:ml-64 pt-16 md:pt-0" />
 
             {/* ── Top Bar ────────────────────────────── */}
-            <div className="absolute top-4 left-4 right-4 md:left-[17rem] z-[1000] flex items-start gap-3 mt-16 md:mt-0">
+            <div className="absolute top-4 left-4 right-4 md:left-[17rem] z-[1000] flex items-start gap-3 mt-16 md:mt-0 pointer-events-none">
                 <div
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-2xl shrink-0"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-2xl shrink-0 pointer-events-auto"
                     style={{
                         background: "rgba(10, 10, 18, 0.85)", backdropFilter: "blur(16px)",
                         border: "1px solid rgba(255, 167, 38, 0.25)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
@@ -312,8 +321,8 @@ export default function CampusMapEditorContent() {
 
             {/* ── Instructions Overlay ────────────────────────────── */}
             {!showForm && (
-                <div className="absolute bottom-10 left-4 md:left-[17rem] z-[1000] max-w-xs animate-in slide-in-from-bottom-5 duration-500">
-                    <div className="bg-[#121217]/90 backdrop-blur-md border border-orange-500/20 rounded-2xl p-4 shadow-2xl">
+                <div className="absolute bottom-10 left-4 md:left-[17rem] z-[1000] max-w-xs animate-in slide-in-from-bottom-5 duration-500 pointer-events-none">
+                    <div className="bg-[#121217]/90 backdrop-blur-md border border-orange-500/20 rounded-2xl p-4 shadow-2xl pointer-events-auto">
                         <div className="flex items-center gap-2 mb-2">
                             <Plus size={16} className="text-orange-400" />
                             <span className="text-xs font-bold text-white uppercase tracking-wider">Quick Start</span>
@@ -337,7 +346,7 @@ export default function CampusMapEditorContent() {
             )}
 
             {/* ── Floor Selector Control ────────────────────────────── */}
-            <div className="absolute top-20 right-4 z-[1000] mt-16 md:mt-0 bg-[#121217] rounded-xl border border-white/10 p-2 shadow-2xl flex flex-col gap-1 w-14">
+            <div className="absolute top-20 right-4 z-[1000] mt-16 md:mt-0 bg-[#121217]/90 backdrop-blur-md rounded-xl border border-white/10 p-2 shadow-2xl flex flex-col gap-1 w-14 pointer-events-auto">
                 {['2', '1', 'Ground', 'B1'].map(f => (
                     <button
                         key={f}
