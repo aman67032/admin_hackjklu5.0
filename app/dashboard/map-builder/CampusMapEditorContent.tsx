@@ -28,6 +28,7 @@ export default function CampusMapEditorContent() {
     const [currentFloor, setCurrentFloor] = useState<string>("Ground");
     const [buildings] = useState(campusAreas.filter(a => a.category === 'academic' || a.category === 'hostel' || a.category === 'utility' || a.category === 'sports'));
     const [isSaving, setIsSaving] = useState(false);
+    const [selectedFocus, setSelectedFocus] = useState<string>("");
 
     // Load initial zones from backend
     useEffect(() => {
@@ -80,16 +81,28 @@ export default function CampusMapEditorContent() {
         // Draw Base Campus Buildings (Non-editable, just for tracing)
         if (boundary) {
             L.polygon(boundary.coordinates, {
-                color: "#4a4a50", weight: 2, opacity: 0.5, fillColor: "#2a2a2e", fillOpacity: 1.0, interactive: false
+                color: "#ff9800", weight: 3, opacity: 0.6, fillColor: "transparent", fillOpacity: 0, interactive: false
             }).addTo(map);
         }
 
         for (const area of campusAreas) {
             if (area.id === "campus-boundary") continue;
             if (area.type === "polygon") {
-                L.polygon(area.coordinates, {
-                    color: area.color, weight: 2, opacity: 0.3, fillColor: area.fillColor, fillOpacity: 0.1, interactive: false
+                const poly = L.polygon(area.coordinates, {
+                    color: area.color,
+                    weight: 2,
+                    opacity: 0.8,
+                    fillColor: area.fillColor,
+                    fillOpacity: 0.25,
+                    interactive: false
                 }).addTo(map);
+
+                // Add a permanent label for each building block
+                poly.bindTooltip(area.name, {
+                    permanent: true,
+                    direction: 'center',
+                    className: 'building-label-editor'
+                }).openTooltip();
             }
         }
 
@@ -300,28 +313,63 @@ export default function CampusMapEditorContent() {
                 }
                 .zone-tooltip { background: transparent; border: none; box-shadow: none; color: white; font-weight: bold; text-shadow: 0px 1px 3px black; font-family: Inter; font-size: 11px;}
                 .leaflet-control-zoom a { background: rgba(20, 20, 30, 0.9) !important; color: #ffa726 !important; border-color: rgba(255, 167, 38, 0.3) !important; }
+                .building-label-editor {
+                    background: transparent !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    color: rgba(255, 255, 255, 0.8) !important;
+                    font-weight: 800 !important;
+                    font-size: 11px !important;
+                    text-transform: uppercase !important;
+                    letter-spacing: 0.05em !important;
+                    text-shadow: 0 0 5px rgba(0,0,0,1) !important;
+                    pointer-events: none !important;
+                }
             `}</style>
 
             {/* Map container */}
-            <div ref={mapContainerRef} className="absolute inset-0 z-0 md:ml-64 pt-16 md:pt-0" />
+            <div ref={mapContainerRef} className="absolute inset-0 z-0 pt-16 md:pt-0" />
 
             {/* ── Top Bar ────────────────────────────── */}
-            <div className="absolute top-4 left-4 right-4 md:left-[17rem] z-[1000] flex items-start gap-3 mt-16 md:mt-0 pointer-events-none">
-                <div
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-2xl shrink-0 pointer-events-auto"
-                    style={{
-                        background: "rgba(10, 10, 18, 0.85)", backdropFilter: "blur(16px)",
-                        border: "1px solid rgba(255, 167, 38, 0.25)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
-                    }}
-                >
-                    <Edit3 size={18} className="text-orange-400" />
-                    <span className="text-sm font-bold text-white tracking-wide">Map Floor Builder</span>
+            <div className="absolute top-4 left-4 right-4 z-[1000] flex items-center justify-between mt-16 md:mt-0 pointer-events-none">
+                <div className="flex items-center gap-3">
+                    <div
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-2xl shrink-0 pointer-events-auto"
+                        style={{
+                            background: "rgba(10, 10, 18, 0.9)", backdropFilter: "blur(16px)",
+                            border: "1px solid rgba(255, 167, 38, 0.25)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+                        }}
+                    >
+                        <Edit3 size={18} className="text-orange-400" />
+                        <span className="text-sm font-bold text-white tracking-wide">Map Floor Builder</span>
+                    </div>
+
+                    <div className="hidden md:flex items-center pointer-events-auto">
+                        <select
+                            value={selectedFocus}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setSelectedFocus(val);
+                                const area = campusAreas.find(a => a.id === val);
+                                if (area && mapRef.current) {
+                                    const bounds = L.polygon(area.coordinates).getBounds();
+                                    mapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 19 });
+                                }
+                            }}
+                            className="bg-[#1a1a24]/90 backdrop-blur-md text-white text-[11px] font-bold border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-orange-500/50 transition-all cursor-pointer shadow-xl uppercase tracking-tighter"
+                        >
+                            <option value="">Jump to Block...</option>
+                            {campusAreas.filter(a => a.id !== 'campus-boundary').map(a => (
+                                <option key={a.id} value={a.id}>{a.name}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
 
             {/* ── Instructions Overlay ────────────────────────────── */}
             {!showForm && (
-                <div className="absolute bottom-10 left-4 md:left-[17rem] z-[1000] max-w-xs animate-in slide-in-from-bottom-5 duration-500 pointer-events-none">
+                <div className="absolute bottom-10 left-4 z-[1000] max-w-xs animate-in slide-in-from-bottom-5 duration-500 pointer-events-none">
                     <div className="bg-[#121217]/90 backdrop-blur-md border border-orange-500/20 rounded-2xl p-4 shadow-2xl pointer-events-auto">
                         <div className="flex items-center gap-2 mb-2">
                             <Plus size={16} className="text-orange-400" />
