@@ -45,6 +45,7 @@ export default function CampusMapContent() {
     const locationMarkerRef = useRef<L.Marker | null>(null);
     const accuracyCircleRef = useRef<L.Circle | null>(null);
     const watchIdRef = useRef<number | null>(null);
+    const lastLocationRef = useRef<{ lat: number; lng: number; accuracy: number } | null>(null);
 
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
     const [isOnCampus, setIsOnCampus] = useState<boolean | null>(null);
@@ -194,6 +195,7 @@ export default function CampusMapContent() {
             }
             setTrackingActive(false);
             setUserLocation(null);
+            lastLocationRef.current = null;
             setIsOnCampus(null);
             setCurrentBuilding(null);
             setNearestBuilding(null);
@@ -216,8 +218,35 @@ export default function CampusMapContent() {
         const watchId = navigator.geolocation.watchPosition(
             (position) => {
                 const { latitude, longitude, accuracy } = position.coords;
-                // ... same inside body
-                setUserLocation({ lat: latitude, lng: longitude, accuracy });
+
+                // Highly restrictive filtering for GPS bounce
+
+                // 1. Completely ignore terrible accuracy readings (> 30 meters)
+                if (accuracy > 30 && lastLocationRef.current) {
+                    return;
+                }
+
+                if (lastLocationRef.current && mapRef.current) {
+                    const dist = mapRef.current.distance(
+                        [lastLocationRef.current.lat, lastLocationRef.current.lng],
+                        [latitude, longitude]
+                    );
+
+                    // 2. Ignore movements smaller than 12 meters to prevent stationary bouncing 
+                    //    (unless the new reading is significantly more accurate)
+                    if (dist < 12 && accuracy >= lastLocationRef.current.accuracy - 5) {
+                        return;
+                    }
+
+                    // 3. If we jump a huge distance instantly, but accuracy is worse, it's likely a GPS glitch
+                    if (dist > 50 && accuracy > lastLocationRef.current.accuracy) {
+                        return;
+                    }
+                }
+
+                const newLoc = { lat: latitude, lng: longitude, accuracy };
+                lastLocationRef.current = newLoc;
+                setUserLocation(newLoc);
 
                 // Check if on campus
                 const campus = campusAreas.find((a) => a.id === "campus-boundary");

@@ -191,7 +191,7 @@ export default function Dock({
                 height: isMobile ? panelHeight + 24 : height, // Increased hover area
                 scrollbarWidth: 'none'
             }}
-            className="fixed bottom-0 left-0 right-0 z-[100] flex justify-center pointer-events-none pb-6 md:pb-10 px-4"
+            className="fixed bottom-0 left-0 right-0 z-[100] flex justify-center pointer-events-none pb-6 md:pb-10 px-2 md:px-4"
         >
             <motion.div
                 onMouseMove={(e) => {
@@ -204,31 +204,39 @@ export default function Dock({
                     isDockHovered.set(0);
                     mouseX.set(Infinity);
                 }}
-                className={`${className} flex items-center md:items-end w-max max-w-full gap-2.5 md:gap-5 rounded-full md:rounded-[2rem] border-orange-500/20 border-2 bg-black/40 backdrop-blur-2xl pointer-events-auto shadow-[0_-15px_60px_rgba(0,0,0,0.7)] px-5 md:px-8 py-2.5`}
+                className={`${className} flex items-center md:items-end w-full md:w-max max-w-full gap-3 md:gap-5 rounded-3xl md:rounded-[2rem] border-orange-500/20 border-2 bg-black/40 backdrop-blur-2xl pointer-events-auto shadow-[0_-15px_60px_rgba(0,0,0,0.7)] px-4 md:px-8 py-2.5 overflow-x-auto md:overflow-visible`}
                 style={{
                     height: panelHeight,
+                    scrollbarWidth: 'none', // Firefox
+                    msOverflowStyle: 'none' // IE/Edge
                 }}
                 role="toolbar"
                 aria-label="Application dock"
             >
+                {/* CSS to hide scrollbar for webkit */}
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    .overflow-x-auto::-webkit-scrollbar { display: none; }
+                `}} />
+
                 {items.map((item, index) => (
-                    <DockItem
-                        key={index}
-                        onClick={item.onClick}
-                        className={item.className}
-                        mouseX={mouseX}
-                        spring={spring}
-                        distance={distance}
-                        magnification={magnification}
-                        baseItemSize={isMobile ? 42 : baseItemSize}
-                        isMobile={isMobile}
-                    >
-                        <DockIcon>{item.icon}</DockIcon>
-                        <DockLabel>{item.label}</DockLabel>
-                    </DockItem>
+                    <div key={index} className="flex-shrink-0">
+                        <DockItem
+                            onClick={item.onClick}
+                            className={item.className}
+                            mouseX={mouseX}
+                            spring={spring}
+                            distance={distance}
+                            magnification={magnification}
+                            baseItemSize={isMobile ? 42 : baseItemSize}
+                            isMobile={isMobile}
+                        >
+                            <DockIcon>{item.icon}</DockIcon>
+                            <DockLabel>{item.label}</DockLabel>
+                        </DockItem>
+                    </div>
                 ))}
             </motion.div>
         </motion.div>
     );
 }
- 

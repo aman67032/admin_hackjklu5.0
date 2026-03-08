@@ -174,10 +174,10 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="page-container animate-fade-in">
+        <div className="page-container animate-fade-in pb-24 md:pb-0">
             {/* Header */}
-            <div className="flex flex-col items-center text-center mb-12 gap-4">
-                <h1 className="text-6xl font-bold tracking-[0.25em] leading-tight"
+            <div className="flex flex-col items-center text-center mb-10 md:mb-12 gap-3 md:gap-4">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-[0.1em] md:tracking-[0.25em] leading-tight px-2"
                     style={{
                         fontFamily: "var(--font-display)",
                         background: "linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-amber) 100%)",

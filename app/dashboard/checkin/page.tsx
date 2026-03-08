@@ -59,10 +59,10 @@ export default function CheckinPage() {
     };
 
     return (
-        <div className="page-container animate-fade-in">
+        <div className="page-container animate-fade-in pb-24 md:pb-0">
             {/* Header */}
-            <div className="flex flex-col items-center text-center mb-12 gap-4">
-                <h1 className="text-6xl font-bold tracking-[0.25em] leading-tight"
+            <div className="flex flex-col items-center text-center mb-8 md:mb-12 gap-4">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-[0.1em] md:tracking-[0.25em] leading-tight"
                     style={{
                         fontFamily: "var(--font-display)",
                         background: "linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-amber) 100%)",
@@ -72,23 +72,23 @@ export default function CheckinPage() {
                     }}>
                     GATES OF ENTRY
                 </h1>
-                <p className="text-xs font-bold tracking-[0.3em] uppercase opacity-80" style={{ color: "var(--accent-amber)" }}>
+                <p className="text-[10px] md:text-xs font-bold tracking-[0.15em] md:tracking-[0.3em] uppercase opacity-80 px-4" style={{ color: "var(--accent-amber)" }}>
                     Search and check-in participants at the gates of Olympus
                 </p>
-                <div className="h-1 w-24 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent mx-auto mt-2" />
+                <div className="h-1 w-16 md:w-24 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent mx-auto mt-2" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Check-in Area */}
                 <div className="lg:col-span-2">
                     {/* Search */}
-                    <div className="mb-10 relative group">
+                    <div className="mb-8 md:mb-10 relative group">
                         <Search size={22} className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-500/50 group-focus-within:text-orange-500 transition-colors" />
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => handleSearch(e.target.value)}
-                            className="input-olympus w-full py-5 pl-14 text-xl font-medium placeholder:text-gray-600 transition-all duration-300"
+                            className="input-olympus w-full py-4 md:py-5 pl-12 md:pl-14 text-base md:text-xl font-medium placeholder:text-gray-600 transition-all duration-300"
                             placeholder="Type a hero's name or email..."
                             autoFocus
                         />
@@ -119,17 +119,17 @@ export default function CheckinPage() {
                                     </p>
 
                                     {/* Leader */}
-                                    <div className="flex items-center gap-3 p-3 rounded-xl mb-2" style={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl mb-2" style={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.05)" }}>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-bold text-white">{team.leaderName}</p>
-                                            <p className="text-xs" style={{ color: "var(--accent-amber)" }}>{team.leaderEmail} · Leader</p>
+                                            <p className="text-xs md:text-sm font-bold text-white truncate">{team.leaderName}</p>
+                                            <p className="text-[10px] md:text-xs truncate" style={{ color: "var(--accent-amber)" }}>{team.leaderEmail} · Leader</p>
                                         </div>
                                         <button
                                             onClick={() => toggleCheckin(team._id, "leader", team.leaderName, team.teamName)}
-                                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${team.leaderCheckedIn
+                                            className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all ${team.leaderCheckedIn
                                                 ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                                                 : 'bg-orange-500/10 text-orange-400 border border-orange-500/20 hover:bg-orange-500/30'
-                                                } flex items-center gap-2`}
+                                                } flex items-center justify-center gap-2 w-full sm:w-auto mt-2 sm:mt-0`}
                                         >
                                             {team.leaderCheckedIn ? <><Check size={16} /> Checked In</> : "Check In →"}
                                         </button>
@@ -137,17 +137,17 @@ export default function CheckinPage() {
 
                                     {/* Members */}
                                     {team.members.map((member: any, idx: number) => (
-                                        <div key={idx} className="flex items-center gap-3 p-3 rounded-xl mb-1" style={{ background: "#18181b", border: "1px solid rgba(255,255,255,0.03)" }}>
+                                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl mb-1" style={{ background: "#18181b", border: "1px solid rgba(255,255,255,0.03)" }}>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-bold text-white">{member.name}</p>
-                                                <p className="text-xs" style={{ color: "var(--accent-amber)" }}>{member.email} · Member</p>
+                                                <p className="text-xs md:text-sm font-bold text-white truncate">{member.name}</p>
+                                                <p className="text-[10px] md:text-xs truncate" style={{ color: "var(--accent-amber)" }}>{member.email} · Member</p>
                                             </div>
                                             <button
                                                 onClick={() => toggleCheckin(team._id, "member", member.name, team.teamName, idx)}
-                                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${member.checkedIn
+                                                className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all ${member.checkedIn
                                                     ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                                                     : 'bg-orange-500/10 text-orange-400 border border-orange-500/20 hover:bg-orange-500/30'
-                                                    } flex items-center gap-2`}
+                                                    } flex items-center justify-center gap-2 w-full sm:w-auto mt-2 sm:mt-0`}
                                             >
                                                 {member.checkedIn ? <><Check size={16} /> Checked In</> : "Check In →"}
                                             </button>

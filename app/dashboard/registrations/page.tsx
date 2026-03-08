@@ -106,11 +106,11 @@ export default function RegistrationsPage() {
         : [];
 
     return (
-        <div className="page-container animate-fade-in">
+        <div className="page-container animate-fade-in pb-24 md:pb-0">
             {/* Header */}
-            <div className="flex flex-col items-center text-center mb-12 gap-6">
+            <div className="flex flex-col items-center text-center mb-8 md:mb-12 gap-4 md:gap-6">
                 <div>
-                    <h1 className="text-6xl font-bold tracking-[0.2em] leading-tight"
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-[0.1em] md:tracking-[0.2em] leading-tight"
                         style={{
                             fontFamily: "var(--font-display)",
                             background: "linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-amber) 100%)",
@@ -120,7 +120,7 @@ export default function RegistrationsPage() {
                         }}>
                         THE REGISTRY
                     </h1>
-                    <p className="text-xs mt-3 font-bold tracking-[0.3em] uppercase opacity-80" style={{ color: "var(--accent-amber)" }}>
+                    <p className="text-[10px] md:text-xs mt-2 md:mt-3 font-bold tracking-[0.15em] md:tracking-[0.3em] uppercase opacity-80" style={{ color: "var(--accent-amber)" }}>
                         {pagination.total} total registrations
                     </p>
                 </div>
@@ -135,7 +135,7 @@ export default function RegistrationsPage() {
             </div>
 
             {/* Search & Filters */}
-            <div className="p-5 mb-8 rounded-2xl border transition-all duration-300"
+            <div className="p-4 md:p-5 mb-6 md:mb-8 rounded-2xl border transition-all duration-300 mx-auto w-full max-w-4xl"
                 style={{
                     background: "#111111",
                     borderColor: "rgba(232, 98, 26, 0.2)",
@@ -197,17 +197,17 @@ export default function RegistrationsPage() {
                                     borderColor: "rgba(232, 98, 26, 0.2)",
                                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                                 }}>
-                                <div className="flex items-start justify-between mb-4 border-b border-orange-500/30 pb-4">
+                                <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 border-b border-orange-500/30 pb-4 gap-3">
                                     <div>
-                                        <div className="flex items-center gap-3">
-                                            <h3 className="font-bold text-xl tracking-wide text-white" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>{team.teamName}</h3>
-                                            {team.teamNumber && <span className="badge badge-gold px-3">#{team.teamNumber}</span>}
-                                            <span className={`badge px-3 ${team.status === 'complete' ? 'badge-success' : team.status === 'disqualified' ? 'badge-danger' : 'badge-muted'}`}>
+                                        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                                            <h3 className="font-bold text-lg md:text-xl tracking-wide text-white break-all" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>{team.teamName}</h3>
+                                            {team.teamNumber && <span className="badge badge-gold px-2 md:px-3">#{team.teamNumber}</span>}
+                                            <span className={`badge px-2 md:px-3 ${team.status === 'complete' ? 'badge-success' : team.status === 'disqualified' ? 'badge-danger' : 'badge-muted'}`}>
                                                 {team.status}
                                             </span>
-                                            {team.teamFullyRsvp && <span className="badge px-3 badge-success">RSVP ✓</span>}
+                                            {team.teamFullyRsvp && <span className="badge px-2 md:px-3 badge-success">RSVP ✓</span>}
                                         </div>
-                                        {team.roomNumber && <p className="text-xs mt-2 font-bold tracking-widest uppercase" style={{ color: "var(--accent-amber)" }}>Room: {team.roomNumber}</p>}
+                                        {team.roomNumber && <p className="text-[10px] md:text-xs mt-2 font-bold tracking-widest uppercase" style={{ color: "var(--accent-amber)" }}>Room: {team.roomNumber}</p>}
                                     </div>
                                 </div>
 

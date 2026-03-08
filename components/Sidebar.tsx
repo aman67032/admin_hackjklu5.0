@@ -40,10 +40,10 @@ export default function Sidebar({
 
     return (
         <aside
-            className="fixed left-0 top-0 h-screen flex flex-col z-40 transition-all duration-300"
+            className={`fixed left-0 top-0 h-screen flex flex-col z-50 transition-all duration-300 shadow-2xl md:shadow-none ${collapsed ? '-translate-x-full md:translate-x-0' : 'translate-x-0'}`}
             style={{
                 width: collapsed ? "80px" : "var(--sidebar-width)",
-                background: "rgba(10, 14, 42, 0.7)",
+                background: "rgba(10, 14, 42, 0.95)", // more opaque on mobile
                 borderRight: "1px solid rgba(232, 98, 26, 0.15)",
                 backdropFilter: "blur(25px)"
             }}
@@ -116,12 +116,12 @@ export default function Sidebar({
                 </button>
 
                 {admin && !collapsed && (
-                    <div className="flex items-center gap-2 p-2 rounded-xl animate-fade-in"
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 p-2 rounded-xl animate-fade-in"
                         style={{
                             background: "rgba(232, 98, 26, 0.1)",
                             border: "1px solid rgba(232, 98, 26, 0.1)"
                         }}>
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shadow-sm"
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shadow-sm shrink-0"
                             style={{ background: "linear-gradient(135deg, var(--accent-orange), var(--accent-amber))", color: "white" }}>
                             {admin.username[0].toUpperCase()}
                         </div>
@@ -129,7 +129,7 @@ export default function Sidebar({
                             <p className="text-xs font-medium truncate" style={{ color: "var(--text-primary)" }}>{admin.username}</p>
                             <p className="text-[10px] uppercase tracking-wider" style={{ color: "var(--gold-dim)" }}>{admin.role}</p>
                         </div>
-                        <button onClick={handleLogout} className="text-xs p-1.5 rounded-md transition-colors hover:bg-red-500/10"
+                        <button onClick={handleLogout} className="text-xs p-1.5 rounded-md transition-colors hover:bg-red-500/10 self-end sm:self-auto"
                             style={{ color: "var(--danger)" }} title="Logout">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />

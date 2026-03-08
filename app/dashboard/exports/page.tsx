@@ -46,10 +46,10 @@ export default function ExportsPage() {
     };
 
     return (
-        <div className="page-container animate-fade-in">
+        <div className="page-container animate-fade-in pb-24 md:pb-0">
             {/* Header */}
-            <div className="flex flex-col items-center text-center mb-12 gap-4">
-                <h1 className="text-6xl font-bold tracking-[0.25em] leading-tight"
+            <div className="flex flex-col items-center text-center mb-10 md:mb-12 gap-3 md:gap-4">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-[0.1em] md:tracking-[0.25em] leading-tight"
                     style={{
                         fontFamily: "var(--font-display)",
                         background: "linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-amber) 100%)",
@@ -59,10 +59,10 @@ export default function ExportsPage() {
                     }}>
                     SCROLLS OF KNOWLEDGE
                 </h1>
-                <p className="text-xs font-bold tracking-[0.3em] uppercase opacity-80" style={{ color: "var(--accent-amber)" }}>
+                <p className="text-[10px] md:text-xs font-bold tracking-[0.15em] md:tracking-[0.3em] uppercase opacity-80 px-4" style={{ color: "var(--accent-amber)" }}>
                     Export data as CSV for logistics, reporting, and management of the realm
                 </p>
-                <div className="h-1 w-24 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent mx-auto mt-2" />
+                <div className="h-1 w-16 md:w-24 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent mx-auto mt-2" />
             </div>
 
             {/* Pre-built Exports */}
@@ -116,7 +116,7 @@ export default function ExportsPage() {
                     <select
                         value={customFilters.checkedIn}
                         onChange={(e) => setCustomFilters(prev => ({ ...prev, checkedIn: e.target.value }))}
-                        className="select-olympus"
+                        className="select-olympus py-3 text-sm"
                     >
                         <option value="">Check-in Status</option>
                         <option value="true">Checked In</option>
@@ -125,7 +125,7 @@ export default function ExportsPage() {
                     <select
                         value={customFilters.messFood}
                         onChange={(e) => setCustomFilters(prev => ({ ...prev, messFood: e.target.value }))}
-                        className="select-olympus"
+                        className="select-olympus py-3 text-sm"
                     >
                         <option value="">Mess Food</option>
                         <option value="true">Opted In</option>
@@ -135,7 +135,7 @@ export default function ExportsPage() {
                 <button
                     onClick={handleCustomExport}
                     disabled={downloading === "custom"}
-                    className="btn-gold flex items-center gap-2"
+                    className="btn-gold flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
                     {downloading === "custom" ? (
                         <>

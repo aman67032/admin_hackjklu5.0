@@ -240,7 +240,9 @@ export default function GreekScene() {
     const [fov, setFov] = useState(40);
 
     useEffect(() => {
-        if (window.innerWidth < 768) setFov(55);
+        // Significantly increase FOV on smaller screens so the pillars still fit
+        if (window.innerWidth < 640) setFov(75);
+        else if (window.innerWidth < 1024) setFov(55);
     }, []);
 
     return (
@@ -267,8 +269,9 @@ export default function GreekScene() {
                     <OrbModel />
                 </Suspense>
 
-                {/* Columns Framing the Scene (Moved further apart) */}
+                {/* Columns Framing the Scene (Moved further apart, adjusted for mobile if needed) */}
                 <Suspense fallback={null}>
+                    {/* On very small FOVs the columns might disappear or crowd, we let them sit out wide. Mobile fov handles the zoom */}
                     <PillarModel position={[-14, -2, -5]} rotation={[0, 0.5, 0]} scale={1.5} showFlame />
                     <PillarModel position={[14, -2, -5]} rotation={[0, -0.5, 0]} scale={1.5} showFlame />
                 </Suspense>

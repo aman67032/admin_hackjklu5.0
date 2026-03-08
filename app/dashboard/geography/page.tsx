@@ -106,10 +106,10 @@ export default function GeographyPage() {
     }
 
     return (
-        <div className="page-container animate-fade-in">
+        <div className="page-container animate-fade-in pb-24 md:pb-0">
             {/* Header */}
-            <div className="flex flex-col items-center text-center mb-12 gap-4">
-                <h1 className="text-6xl font-bold tracking-[0.2em] leading-tight"
+            <div className="flex flex-col items-center text-center mb-8 md:mb-12 gap-3 md:gap-4">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-[0.1em] md:tracking-[0.2em] leading-tight"
                     style={{
                         fontFamily: "var(--font-display)",
                         background: "linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-amber) 100%)",
@@ -119,10 +119,10 @@ export default function GeographyPage() {
                     }}>
                     REALM MAP
                 </h1>
-                <p className="text-xs font-bold tracking-[0.3em] uppercase opacity-80" style={{ color: "var(--accent-amber)" }}>
+                <p className="text-[10px] md:text-xs font-bold tracking-[0.15em] md:tracking-[0.3em] uppercase opacity-80 px-4" style={{ color: "var(--accent-amber)" }}>
                     {data?.totalParticipants || 0} participants mapped across India
                 </p>
-                <div className="h-1 w-24 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent mx-auto" />
+                <div className="h-1 w-16 md:w-24 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent mx-auto mt-2" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">

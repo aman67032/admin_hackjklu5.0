@@ -38,31 +38,31 @@ export default function LandingPage() {
         </div>
 
         {/* Central Huge Title Area */}
-        <div className="relative mb-16 w-full flex flex-col items-center">
+        <div className="relative mb-12 sm:mb-16 w-full flex flex-col items-center">
           {/* Main Title Glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[150%] bg-[#d4a843]/10 blur-[100px] rounded-full pointer-events-none -z-10" />
 
-          <div className="flex justify-center mb-8 animate-float">
+          <div className="flex justify-center mb-6 sm:mb-8 animate-float">
             <Image
               src="/hackjklu_logo.png"
               alt="HackJKLU Logo icon"
               width={220}
               height={220}
-              className="h-[220px] w-auto object-contain drop-shadow-[0_0_30px_rgba(212,168,67,0.6)]"
+              className="h-[140px] sm:h-[180px] md:h-[220px] w-auto object-contain drop-shadow-[0_0_30px_rgba(212,168,67,0.6)]"
               priority
               loading="eager"
-              sizes="(max-width: 768px) 180px, 220px"
+              sizes="(max-width: 640px) 140px, (maxwidth: 768px) 180px, 220px"
             />
           </div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#f5e6d3] via-[#e5d5c3] to-[#c4b5a4] drop-shadow-[0_10px_35px_rgba(229,213,195,0.4)] tracking-widest leading-none mb-6 whitespace-nowrap"
+          <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-[#f5e6d3] via-[#e5d5c3] to-[#c4b5a4] drop-shadow-[0_10px_35px_rgba(229,213,195,0.4)] tracking-widest md:tracking-[0.15em] leading-tight text-center mb-4 sm:mb-6 px-2"
             style={{ fontFamily: 'var(--font-display)' }}>
             HACKJKLU V5.0
           </h1>
 
-          <div className="flex items-center justify-center gap-6 w-full max-w-2xl mx-auto mt-8">
+          <div className="flex items-center justify-center gap-3 sm:gap-6 w-full max-w-2xl mx-auto mt-4 sm:mt-8 px-4">
             <div className="h-[2px] bg-gradient-to-r from-transparent via-[#d4a843] to-[#d4a843] flex-1"></div>
-            <h2 className="text-sm sm:text-base md:text-xl text-[#eab308] tracking-[0.3em] whitespace-nowrap px-4 uppercase font-semibold drop-shadow-[0_0_10px_rgba(212,168,67,0.8)]"
+            <h2 className="text-[10px] sm:text-sm md:text-xl text-[#eab308] tracking-[0.2em] sm:tracking-[0.3em] whitespace-nowrap px-2 sm:px-4 uppercase font-semibold drop-shadow-[0_0_10px_rgba(212,168,67,0.8)]"
               style={{ fontFamily: 'var(--font-body)' }}>
               By Council of Technical Affairs
             </h2>

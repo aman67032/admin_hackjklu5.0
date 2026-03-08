@@ -34,18 +34,18 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
       <div className="relative z-10 w-full max-w-md px-6 animate-fade-in">
         {/* Hero / Title */}
-        <div className="text-center mb-10">
-          <div className="flex justify-center mb-6 animate-float">
+        <div className="text-center mb-8 md:mb-10 mt-8 md:mt-0">
+          <div className="flex justify-center mb-4 md:mb-6 animate-float">
             <Image
               src="/hackjklu_logo.png"
               alt="HackJKLU Logo"
               width={160}
               height={160}
-              className="h-[140px] w-auto drop-shadow-[0_0_25px_rgba(232,98,26,0.5)]"
+              className="h-[100px] md:h-[140px] w-auto drop-shadow-[0_0_25px_rgba(232,98,26,0.5)]"
               priority
             />
           </div>
-          <h1 className="text-4xl font-bold tracking-wider drop-shadow-lg leading-tight"
+          <h1 className="text-3xl md:text-4xl font-bold tracking-wider drop-shadow-lg leading-tight"
             style={{
               fontFamily: "var(--font-display)",
               background: "linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-amber) 100%)",
@@ -54,14 +54,14 @@ export default function LoginPage() {
             }}>
             HACKJKLU 5.0
           </h1>
-          <p className="mt-3 text-lg font-medium"
+          <p className="mt-2 text-sm md:text-lg font-medium px-4"
             style={{ color: "var(--accent-amber)", fontFamily: "var(--font-body)" }}>
             Admin Portal — Gates of Olympus
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="p-8 rounded-2xl border transition-all duration-300"
+        <div className="p-6 md:p-8 rounded-2xl border transition-all duration-300"
           style={{
             background: "var(--card-bg-alt)",
             borderColor: "var(--card-border-alt)",
