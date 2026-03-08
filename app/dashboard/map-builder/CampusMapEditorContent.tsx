@@ -176,6 +176,13 @@ export default function CampusMapEditorContent() {
 
         mapRef.current = map;
 
+        // Force a size recalculation after a short delay to ensure the container is ready
+        setTimeout(() => {
+            if (mapRef.current) {
+                mapRef.current.invalidateSize();
+            }
+        }, 200);
+
         return () => {
             map.remove();
             mapRef.current = null;
@@ -312,7 +319,9 @@ export default function CampusMapEditorContent() {
                     border: 1px solid rgba(255,167,38,0.2) !important;
                 }
                 .zone-tooltip { background: transparent; border: none; box-shadow: none; color: white; font-weight: bold; text-shadow: 0px 1px 3px black; font-family: Inter; font-size: 11px;}
+                .leaflet-control-zoom { margin-bottom: 20px !important; margin-right: 10px !important; }
                 .leaflet-control-zoom a { background: rgba(20, 20, 30, 0.9) !important; color: #ffa726 !important; border-color: rgba(255, 167, 38, 0.3) !important; }
+                .leaflet-top.leaflet-left { top: 70px !important; left: 10px !important; } /* Move draw controls below top bar */
                 .building-label-editor {
                     background: transparent !important;
                     border: none !important;
@@ -328,7 +337,11 @@ export default function CampusMapEditorContent() {
             `}</style>
 
             {/* Map container */}
-            <div ref={mapContainerRef} className="absolute inset-0 z-0 pt-16 md:pt-0" />
+            <div
+                ref={mapContainerRef}
+                className="absolute inset-0 z-0"
+                style={{ width: '100%', height: '100%', background: '#0a0a0f' }}
+            />
 
             {/* ── Top Bar ────────────────────────────── */}
             <div className="absolute top-4 left-4 right-4 z-[1000] flex items-center justify-between mt-16 md:mt-0 pointer-events-none">
