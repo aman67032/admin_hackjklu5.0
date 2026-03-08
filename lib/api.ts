@@ -184,3 +184,33 @@ export const mapZonesApi = {
     delete: (id: string) =>
         apiFetch<any>(`/map-zones/${id}`, { method: 'DELETE' }),
 };
+
+// Participant Auth
+export const participantAuthApi = {
+    login: (email: string, password: string) =>
+        apiFetch<{ token: string; team: { id: string; name: string; email: string } }>('/participantAuth/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password }),
+            skipAuth: true,
+        }),
+    sendLocation: (lat: number, lng: number, token?: string) => {
+        const options: FetchOptions = {
+            method: 'POST',
+            body: JSON.stringify({ lat, lng }),
+            skipAuth: true,
+        };
+        // Use custom token if provided
+        if (token) {
+            options.headers = { 'Authorization': `Bearer ${token}` };
+        }
+        return apiFetch<{ success: boolean; tracePassDetected: boolean }>('/participantAuth/location', options);
+    }
+};
+
+// Participant Admin
+export const participantAdminApi = {
+    generatePasswords: () => apiFetch<{ success: boolean; generated: number }>('/participantAdmin/generate-passwords', { method: 'POST' }),
+    sendEmails: () => apiFetch<{ success: boolean; message: string }>('/participantAdmin/send-emails', { method: 'POST' }),
+    getLocations: () => apiFetch<{ locations: any[]; violations: any[] }>('/participantAdmin/locations'),
+    disqualifyTeam: (teamId: string) => apiFetch<{ success: boolean; message: string }>(`/participantAdmin/disqualify/${teamId}`, { method: 'POST' }),
+};
