@@ -143,19 +143,9 @@ export default function CampusMapContent() {
                     className: area.id === highlightedAreaId ? "searching-highlight-pulse" : ""
                 }).addTo(map);
 
-                polygon.bindPopup(
-                    `<div style="font-family:Inter,sans-serif;min-width:180px;">
-            <div style="font-size:18px;margin-bottom:4px;">${area.icon}</div>
-            <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px;">${area.name}</div>
-            <div style="font-size:12px;color:#b0b0b0;line-height:1.4;">${area.description}</div>
-          </div>`,
-                    {
-                        className: "campus-popup",
-                        closeButton: true,
-                    }
-                );
-
-                polygon.on("click", () => {
+                // We rely entirely on the React custom panel now, no Leaflet popups
+                polygon.on("click", (e) => {
+                    L.DomEvent.stopPropagation(e);
                     setSelectedArea(area);
                 });
             } else if (area.type === "line") {
@@ -165,19 +155,8 @@ export default function CampusMapContent() {
                     opacity: 0.85,
                 }).addTo(map);
 
-                polyline.bindPopup(
-                    `<div style="font-family:Inter,sans-serif;min-width:180px;">
-            <div style="font-size:18px;margin-bottom:4px;">${area.icon}</div>
-            <div style="font-weight:700;font-size:14px;color:#fff;margin-bottom:4px;">${area.name}</div>
-            <div style="font-size:12px;color:#b0b0b0;line-height:1.4;">${area.description}</div>
-          </div>`,
-                    {
-                        className: "campus-popup",
-                        closeButton: true,
-                    }
-                );
-
-                polyline.on("click", () => {
+                polyline.on("click", (e) => {
+                    L.DomEvent.stopPropagation(e);
                     setSelectedArea(area);
                 });
             }
