@@ -727,20 +727,21 @@ export default function CampusMapContent() {
                 </div>
             )}
 
-            {/* ── Location Controls (bottom-left) ────────────────────────────── */}
-            <div className="absolute bottom-32 md:bottom-28 left-4 z-[1000] flex flex-col gap-2">
+            {/* ── Location Controls (bottom-right FABs on mobile, bottom-left on desktop) ────────────────────────────── */}
+            <div className="absolute bottom-32 right-4 md:bottom-28 md:left-4 md:right-auto z-[1000] flex flex-col gap-2">
                 {/* Track my location */}
                 <button
                     onClick={toggleTracking}
-                    className="flex items-center gap-2 px-3 md:px-4 py-2.5 rounded-xl transition-all duration-200"
+                    title={trackingActive ? "Tracking ON" : "Track Me"}
+                    className="flex items-center justify-center md:justify-start gap-2 w-12 h-12 md:w-auto md:px-4 md:py-2.5 rounded-full md:rounded-xl transition-all duration-200 shadow-lg"
                     style={{
                         background: trackingActive ? "rgba(79, 195, 247, 0.2)" : "rgba(10, 10, 18, 0.85)",
                         backdropFilter: "blur(16px)",
                         border: `1px solid ${trackingActive ? "rgba(79, 195, 247, 0.5)" : "rgba(255,255,255,0.1)"}`,
                     }}
                 >
-                    <Navigation size={16} className={trackingActive ? "text-blue-400" : "text-gray-400"} />
-                    <span className={`text-xs font-semibold ${trackingActive ? "text-blue-300" : "text-gray-300"}`}>
+                    <Navigation size={20} className={trackingActive ? "text-blue-400" : "text-gray-400"} />
+                    <span className={`hidden md:inline text-xs font-semibold ${trackingActive ? "text-blue-300" : "text-gray-300"}`}>
                         {trackingActive ? "Tracking ON" : "Track Me"}
                     </span>
                 </button>
@@ -749,37 +750,39 @@ export default function CampusMapContent() {
                 {userLocation && (
                     <button
                         onClick={centerOnUser}
-                        className="flex items-center gap-2 px-3 md:px-4 py-2.5 rounded-xl transition-all duration-200"
+                        title="My Location"
+                        className="flex items-center justify-center md:justify-start gap-2 w-12 h-12 md:w-auto md:px-4 md:py-2.5 rounded-full md:rounded-xl transition-all duration-200 shadow-lg"
                         style={{
                             background: "rgba(10, 10, 18, 0.85)",
                             backdropFilter: "blur(16px)",
                             border: "1px solid rgba(255,255,255,0.1)",
                         }}
                     >
-                        <Locate size={16} className="text-gray-400" />
-                        <span className="text-xs font-semibold text-gray-300">My Location</span>
+                        <Locate size={20} className="text-gray-400" />
+                        <span className="hidden md:inline text-xs font-semibold text-gray-300">My Location</span>
                     </button>
                 )}
 
                 {/* Reset view */}
                 <button
                     onClick={centerOnCampus}
-                    className="flex items-center gap-2 px-3 md:px-4 py-2.5 rounded-xl transition-all duration-200"
+                    title="Reset View"
+                    className="flex items-center justify-center md:justify-start gap-2 w-12 h-12 md:w-auto md:px-4 md:py-2.5 rounded-full md:rounded-xl transition-all duration-200 shadow-lg"
                     style={{
                         background: "rgba(10, 10, 18, 0.85)",
                         backdropFilter: "blur(16px)",
                         border: "1px solid rgba(255,255,255,0.1)",
                     }}
                 >
-                    <MapPin size={16} className="text-gray-400" />
-                    <span className="text-xs font-semibold text-gray-300">Reset View</span>
+                    <MapPin size={20} className="text-gray-400" />
+                    <span className="hidden md:inline text-xs font-semibold text-gray-300">Reset View</span>
                 </button>
             </div>
 
-            {/* ── Location Status Bar (bottom) ────────────────────────────── */}
+            {/* ── Location Status Bar (top-centered on mobile, bottom-centered on desktop) ────────────────────────────── */}
             {(trackingActive || locationError) && (
                 <div
-                    className="absolute bottom-32 md:bottom-28 left-1/2 -translate-x-1/2 z-[1000] rounded-2xl px-4 py-3 max-w-md w-[calc(100vw-6rem)] md:w-[90vw]"
+                    className="absolute top-20 md:top-auto md:bottom-28 left-1/2 -translate-x-1/2 z-[1000] rounded-2xl px-4 py-3 max-w-md w-[calc(100vw-6rem)] md:w-[90vw]"
                     style={{
                         background: "rgba(10, 10, 18, 0.92)",
                         backdropFilter: "blur(20px)",
