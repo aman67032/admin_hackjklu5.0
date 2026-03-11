@@ -8,6 +8,7 @@ export default function TeamsPage() {
     const [teams, setTeams] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedSize, setSelectedSize] = useState<string>("");
+    const [selectedStatus, setSelectedStatus] = useState<string>("");
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [metadata, setMetadata] = useState<{ sizeCounts: Record<number, number> }>({ sizeCounts: {} });
@@ -44,14 +45,15 @@ export default function TeamsPage() {
             const params: Record<string, string> = { limit: "200" };
             if (debouncedSearch) params.search = debouncedSearch;
             if (selectedSize) params.teamSize = selectedSize;
+            if (selectedStatus) params.status = selectedStatus;
             const data = await teamsApi.list(params);
             setTeams(data.teams);
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
         } finally {
             setLoading(false);
         }
-    }, [debouncedSearch, selectedSize]);
+    }, [debouncedSearch, selectedSize, selectedStatus]);
 
     useEffect(() => { loadMetadata(); }, []);
     useEffect(() => { loadTeams(); }, [loadTeams]);
@@ -132,8 +134,9 @@ export default function TeamsPage() {
             const csvData = await teamsApi.list(params) as any; // Re-use list to get full filtered set, or call exportApi
             // Actually exportsApi.teams is better for raw CSV
             const { exportsApi, downloadCSV } = await import("@/lib/api");
+            if (selectedStatus) params.status = selectedStatus;
             const csv = await exportsApi.teams(params);
-            downloadCSV(csv, `teams_size_${selectedSize || 'all'}_${Date.now()}.csv`);
+            downloadCSV(csv, `teams_size_${selectedSize || 'all'}_status_${selectedStatus || 'any'}_${Date.now()}.csv`);
         } catch (err) {
             console.error(err);
         }
@@ -164,23 +167,29 @@ export default function TeamsPage() {
             <div className="mb-8 md:mb-12 max-w-4xl mx-auto space-y-6">
                 <div className="flex flex-wrap justify-center gap-3">
                     <button 
-                        onClick={() => setSelectedSize("")}
-                        className={`px-6 py-2 rounded-full text-xs font-bold transition-all duration-300 border ${!selectedSize ? 'bg-orange-500 text-white border-orange-400' : 'bg-black/40 text-gray-400 border-white/10 hover:border-orange-500/50'}`}
+                        onClick={() => { setSelectedSize(""); setSelectedStatus(""); }}
+                        className={`px-6 py-2 rounded-full text-xs font-bold transition-all duration-300 border ${!selectedSize && !selectedStatus ? 'bg-orange-500 text-white border-orange-400 font-black' : 'bg-black/40 text-gray-400 border-white/10 hover:border-orange-500/50'}`}
                     >
                         ALL ARMIES
                     </button>
-                    {[2, 3, 4, 5].map(size => (
+                    {[1, 2, 3, 4, 5].map(size => (
                         <button 
                             key={size}
                             onClick={() => setSelectedSize(size.toString())}
-                            className={`px-6 py-2 rounded-full text-xs font-bold transition-all duration-300 border flex items-center gap-2 ${selectedSize === size.toString() ? 'bg-orange-500 text-white border-orange-400 shadow-[0_0_15px_rgba(232,98,26,0.4)]' : 'bg-black/40 text-gray-400 border-white/10 hover:border-orange-500/50'}`}
+                            className={`px-6 py-2 rounded-full text-xs font-bold transition-all duration-300 border flex items-center gap-2 ${selectedSize === size.toString() ? 'bg-orange-500 text-white border-orange-400 shadow-[0_0_15px_rgba(232,98,26,0.4)] font-black' : 'bg-black/40 text-gray-400 border-white/10 hover:border-orange-500/50'}`}
                         >
-                            {size} MEMBERS
+                            {size} {size === 1 ? 'MEMBER' : 'MEMBERS'}
                             <span className="px-1.5 py-0.5 rounded-md bg-black/60 text-[10px] opacity-80">
                                 {metadata.sizeCounts[size] || 0}
                             </span>
                         </button>
                     ))}
+                    <button 
+                        onClick={() => setSelectedStatus(selectedStatus === "incomplete" ? "" : "incomplete")}
+                        className={`px-6 py-2 rounded-full text-xs font-bold transition-all duration-300 border ${selectedStatus === "incomplete" ? 'bg-red-600 text-white border-red-400 shadow-[0_0_15px_rgba(220,38,38,0.4)] font-black' : 'bg-black/40 text-gray-400 border-white/10 hover:border-red-500/30'}`}
+                    >
+                        INCOMPLETE
+                    </button>
                 </div>
 
                 <div className="relative group">
