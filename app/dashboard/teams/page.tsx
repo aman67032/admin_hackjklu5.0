@@ -108,6 +108,7 @@ export default function TeamsPage() {
                                             {team.status}
                                         </span>
                                         {team.roomNumber && <span className="text-xs font-bold flex items-center gap-1 text-white" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}><Home size={12} /> {team.roomNumber}</span>}
+                                        {team.domain && <span className="text-xs font-bold flex items-center gap-1 text-orange-400/80" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}><Edit2 size={12} /> {team.domain}</span>}
                                     </div>
                                 </div>
                                 <button onClick={() => handleEdit(team)} className="btn-ghost self-start text-[10px] uppercase tracking-wider px-3 py-1.5 flex items-center gap-1 font-bold shrink-0"><Edit2 size={12} /> Edit</button>
@@ -162,8 +163,8 @@ export default function TeamsPage() {
                                         <p className="text-xs md:text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>{team.leaderName}</p>
                                         <p className="text-[10px] md:text-xs truncate" style={{ color: "var(--text-muted)" }}>{team.leaderEmail}</p>
                                     </div>
-                                    <span className={`badge flex justify-center items-center w-6 h-6 p-0 shrink-0 rounded-full ${team.leaderCheckedIn ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                                        {team.leaderCheckedIn ? <Check size={14} /> : <X size={14} />}
+                                    <span className={`badge flex justify-center items-center w-6 h-6 p-0 shrink-0 rounded-full ${team.checkedIn ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                        {team.checkedIn ? <Check size={14} /> : <X size={14} />}
                                     </span>
                                 </div>
 
@@ -182,8 +183,8 @@ export default function TeamsPage() {
                                             <p className="text-xs md:text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>{member.name}</p>
                                             <p className="text-[10px] md:text-xs truncate" style={{ color: "var(--text-muted)" }}>{member.email}</p>
                                         </div>
-                                        <span className={`badge flex justify-center items-center w-6 h-6 p-0 shrink-0 rounded-full ${member.checkedIn ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                                            {member.checkedIn ? <Check size={14} /> : <X size={14} />}
+                                        <span className={`badge flex justify-center items-center w-6 h-6 p-0 shrink-0 rounded-full ${team.checkedIn ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                            {team.checkedIn ? <Check size={14} /> : <X size={14} />}
                                         </span>
                                     </div>
                                 ))}

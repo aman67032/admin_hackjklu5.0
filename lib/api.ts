@@ -10,6 +10,7 @@ const getApiBase = () => {
 };
 
 const API_BASE = getApiBase();
+export const SOCKET_URL = API_BASE.replace('/api', '');
 
 interface FetchOptions extends RequestInit {
     skipAuth?: boolean;
@@ -90,10 +91,9 @@ export const teamsApi = {
         apiFetch<any>(`/teams/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: string) =>
         apiFetch<any>(`/teams/${id}`, { method: 'DELETE' }),
-    checkin: (id: string, target: string, memberIndex?: number) =>
+    checkin: (id: string) =>
         apiFetch<any>(`/teams/${id}/checkin`, {
             method: 'POST',
-            body: JSON.stringify({ target, memberIndex }),
         }),
     swap: (fromTeamId: string, fromMemberIndex: number, toTeamId: string, toMemberIndex: number) =>
         apiFetch<any>('/teams/swap', {
@@ -175,42 +175,3 @@ export function downloadCSV(csv: string, filename: string) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
-
-// Map Zones
-export const mapZonesApi = {
-    get: () => apiFetch<any[]>('/map-zones'),
-    sync: (zones: any[]) =>
-        apiFetch<any>('/map-zones/sync', { method: 'POST', body: JSON.stringify({ zones }) }),
-    delete: (id: string) =>
-        apiFetch<any>(`/map-zones/${id}`, { method: 'DELETE' }),
-};
-
-// Participant Auth
-export const participantAuthApi = {
-    login: (email: string, password: string) =>
-        apiFetch<{ token: string; team: { id: string; name: string; email: string } }>('/participantAuth/login', {
-            method: 'POST',
-            body: JSON.stringify({ email, password }),
-            skipAuth: true,
-        }),
-    sendLocation: (lat: number, lng: number, token?: string) => {
-        const options: FetchOptions = {
-            method: 'POST',
-            body: JSON.stringify({ lat, lng }),
-            skipAuth: true,
-        };
-        // Use custom token if provided
-        if (token) {
-            options.headers = { 'Authorization': `Bearer ${token}` };
-        }
-        return apiFetch<{ success: boolean; tracePassDetected: boolean }>('/participantAuth/location', options);
-    }
-};
-
-// Participant Admin
-export const participantAdminApi = {
-    generatePasswords: () => apiFetch<{ success: boolean; generated: number }>('/participantAdmin/generate-passwords', { method: 'POST' }),
-    sendEmails: () => apiFetch<{ success: boolean; message: string }>('/participantAdmin/send-emails', { method: 'POST' }),
-    getLocations: () => apiFetch<{ locations: any[]; violations: any[] }>('/participantAdmin/locations'),
-    disqualifyTeam: (teamId: string) => apiFetch<{ success: boolean; message: string }>(`/participantAdmin/disqualify/${teamId}`, { method: 'POST' }),
-};

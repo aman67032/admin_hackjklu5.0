@@ -42,9 +42,9 @@ export default function RegistrationsPage() {
         setFilters(prev => ({ ...prev, [key]: value }));
     };
 
-    const toggleCheckin = async (teamId: string, target: string, memberIndex?: number) => {
+    const toggleCheckin = async (teamId: string) => {
         try {
-            await teamsApi.checkin(teamId, target, memberIndex);
+            await teamsApi.checkin(teamId);
             loadTeams(pagination.page);
         } catch (err) {
             console.error(err);
@@ -75,16 +75,15 @@ export default function RegistrationsPage() {
                 _participantGender: team.leaderGender,
                 _participantBio: team.leaderBio,
                 _devfolioProfile: team.devfolioProfile,
-                _checkedIn: team.leaderCheckedIn,
+                _checkedIn: team.checkedIn,
                 _isRsvp: team.leaderIsRsvp,
                 _github: team.leaderGithub,
                 _linkedin: team.leaderLinkedin,
                 _resume: team.leaderResume,
                 _role: "Leader",
                 _teamId: team._id,
-                _memberIndex: -1,
             },
-            ...team.members.map((m: any, i: number) => ({
+            ...team.members.map((m: any) => ({
                 ...team,
                 _participantName: m.name,
                 _participantEmail: m.email,
@@ -93,14 +92,13 @@ export default function RegistrationsPage() {
                 _participantGender: m.gender,
                 _participantBio: m.bio,
                 _devfolioProfile: m.devfolioProfile,
-                _checkedIn: m.checkedIn,
+                _checkedIn: team.checkedIn, // Use team level status
                 _isRsvp: m.isRsvp,
                 _github: m.github,
                 _linkedin: m.linkedin,
                 _resume: m.resume,
                 _role: "Member",
                 _teamId: team._id,
-                _memberIndex: i,
             })),
         ])
         : [];
@@ -197,7 +195,7 @@ export default function RegistrationsPage() {
                                     borderColor: "rgba(232, 98, 26, 0.2)",
                                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                                 }}>
-                                <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 border-b border-orange-500/30 pb-4 gap-3">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 border-b border-orange-500/30 pb-4 gap-4">
                                     <div>
                                         <div className="flex flex-wrap items-center gap-2 md:gap-3">
                                             <h3 className="font-bold text-lg md:text-xl tracking-wide text-white break-all" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>{team.teamName}</h3>
@@ -207,8 +205,17 @@ export default function RegistrationsPage() {
                                             </span>
                                             {team.teamFullyRsvp && <span className="badge px-2 md:px-3 badge-success">RSVP ✓</span>}
                                         </div>
-                                        {team.roomNumber && <p className="text-[10px] md:text-xs mt-2 font-bold tracking-widest uppercase" style={{ color: "var(--accent-amber)" }}>Room: {team.roomNumber}</p>}
+                                        {team.roomNumber && <p className="text-[10px] md:text-xs mt-2 font-bold tracking-widest uppercase" style={{ color: "var(--accent-amber)" }}>Room: {team.roomNumber} · Domain: {team.domain || 'N/A'}</p>}
                                     </div>
+
+                                    <button
+                                        onClick={() => toggleCheckin(team._id)}
+                                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${team.checkedIn 
+                                            ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                                            : 'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20'}`}
+                                    >
+                                        {team.checkedIn ? <><Check size={16} /> TEAM CHECKED IN</> : "CHECK IN TEAM →"}
+                                    </button>
                                 </div>
 
                                 <div className="overflow-x-auto">
@@ -223,7 +230,6 @@ export default function RegistrationsPage() {
                                                 <th>Gender</th>
                                                 <th>RSVP</th>
                                                 <th>Links</th>
-                                                <th>Check-in</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -245,14 +251,6 @@ export default function RegistrationsPage() {
                                                     {team.leaderLinkedin && <a href={team.leaderLinkedin} target="_blank" title="LinkedIn" className="text-gray-400 hover:text-white transition-colors"><Linkedin size={18} /></a>}
                                                     {team.leaderResume && <a href={team.leaderResume} target="_blank" title="Resume" className="text-gold hover:text-yellow-300 transition-colors"><FileText size={18} /></a>}
                                                 </td>
-                                                <td>
-                                                    <button
-                                                        onClick={() => toggleCheckin(team._id, "leader")}
-                                                        className={`px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center justify-center gap-1 w-[70px] ${team.leaderCheckedIn ? 'bg-green-500/20 text-green-400' : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'}`}
-                                                    >
-                                                        {team.leaderCheckedIn ? <><Check size={14} /> In</> : <><X size={14} /> Out</>}
-                                                    </button>
-                                                </td>
                                             </tr>
                                             {team.members.map((member: any, idx: number) => (
                                                 <tr key={idx}>
@@ -272,14 +270,6 @@ export default function RegistrationsPage() {
                                                         {member.github && <a href={member.github} target="_blank" title="GitHub" className="text-gray-400 hover:text-white transition-colors"><Github size={18} /></a>}
                                                         {member.linkedin && <a href={member.linkedin} target="_blank" title="LinkedIn" className="text-gray-400 hover:text-white transition-colors"><Linkedin size={18} /></a>}
                                                         {member.resume && <a href={member.resume} target="_blank" title="Resume" className="text-gold hover:text-yellow-300 transition-colors"><FileText size={18} /></a>}
-                                                    </td>
-                                                    <td>
-                                                        <button
-                                                            onClick={() => toggleCheckin(team._id, "member", idx)}
-                                                            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center justify-center gap-1 w-[70px] ${member.checkedIn ? 'bg-green-500/20 text-green-400' : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'}`}
-                                                        >
-                                                            {member.checkedIn ? <><Check size={14} /> In</> : <><X size={14} /> Out</>}
-                                                        </button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -339,7 +329,7 @@ export default function RegistrationsPage() {
                                             </td>
                                             <td>
                                                 <button
-                                                    onClick={() => toggleCheckin(p._teamId, p._memberIndex === -1 ? "leader" : "member", p._memberIndex === -1 ? undefined : p._memberIndex)}
+                                                    onClick={() => toggleCheckin(p._teamId)}
                                                     className={`px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center justify-center gap-1 w-[70px] ${p._checkedIn ? 'bg-green-500/20 text-green-400' : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'}`}
                                                 >
                                                     {p._checkedIn ? <><Check size={14} /> In</> : <><X size={14} /> Out</>}

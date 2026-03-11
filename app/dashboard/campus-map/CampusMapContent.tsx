@@ -5,7 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { campusAreas, CAMPUS_CENTER, CAMPUS_ZOOM, categoryColors, CampusArea, CustomFloorZone } from "./campus-map-data";
 import { MapPin, Navigation, Search, ChevronDown, ChevronUp, Layers, X, Locate, Info, Loader2 } from "lucide-react";
-import { mapZonesApi } from "@/lib/api";
+// import { mapZonesApi } from "@/lib/api";
 
 // Point-in-polygon ray casting
 function isPointInPolygon(point: [number, number], polygon: [number, number][]): boolean {
@@ -60,6 +60,7 @@ export default function CampusMapContent() {
     const [trackingActive, setTrackingActive] = useState(false);
 
     // Custom Zones & Floors
+    // Removed mapZonesApi dependency but keeping UI state for now to minimize refactor risk
     const [customZones, setCustomZones] = useState<CustomFloorZone[]>([]);
     const [selectedFloor, setSelectedFloor] = useState<string>("Ground");
     const [availableFloors, setAvailableFloors] = useState<string[]>([]);
@@ -200,8 +201,9 @@ export default function CampusMapContent() {
         };
     }, []);
 
-    // Load custom zones from backend
+    // Load custom zones - DISABLED as mapZonesApi is removed
     useEffect(() => {
+        /*
         const fetchZones = async () => {
             setIsLoadingZones(true);
             try {
@@ -214,6 +216,7 @@ export default function CampusMapContent() {
             }
         };
         fetchZones();
+        */
     }, []);
 
     // Effect: Update available floors based on selected area
