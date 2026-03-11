@@ -1,7 +1,8 @@
+
 "use client";
 
 import { useState, useCallback } from "react";
-import { Shield, Check, ClipboardList, Search } from "lucide-react";
+import { Shield, Check, ClipboardList, Search, Edit3, Save, Plug, Monitor, MapPin } from "lucide-react";
 import { teamsApi } from "@/lib/api";
 
 export default function CheckinPage() {
@@ -10,6 +11,8 @@ export default function CheckinPage() {
     const [loading, setLoading] = useState(false);
     const [recentCheckins, setRecentCheckins] = useState<{ name: string; team: string; time: string }[]>([]);
     const [stats, setStats] = useState({ total: 0, checkedIn: 0 });
+    const [editingTeam, setEditingTeam] = useState<string | null>(null);
+    const [editData, setEditData] = useState<{ roomNumber?: string; domain?: string; extensionBoard?: boolean }>({});
 
     const searchParticipants = useCallback(async (query: string) => {
         if (!query.trim()) { setResults([]); return; }
@@ -55,6 +58,32 @@ export default function CheckinPage() {
             searchParticipants(search);
         } catch (err) {
             console.error(err);
+        }
+    };
+
+    const handleEditToggle = (teamId: string, teamData: any) => {
+        if (editingTeam === teamId) {
+            // Cancel edit
+            setEditingTeam(null);
+            setEditData({});
+        } else {
+            setEditingTeam(teamId);
+            setEditData({
+                roomNumber: teamData.roomNumber || "",
+                domain: teamData.domain || "",
+                extensionBoard: !!teamData.extensionBoard
+            });
+        }
+    };
+
+    const handleSaveMetadata = async (teamId: string) => {
+        try {
+            await teamsApi.update(teamId, editData);
+            setEditingTeam(null);
+            searchParticipants(search);
+        } catch (err) {
+            console.error("Failed to update team metadata:", err);
+            alert("Failed to save team tracking data.");
         }
     };
 
@@ -113,10 +142,77 @@ export default function CheckinPage() {
                                         borderColor: "rgba(232, 98, 26, 0.2)",
                                         boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
                                     }}>
-                                    <p className="text-xs font-bold mb-3 flex items-center gap-2" style={{ color: "var(--accent-amber)", fontFamily: "var(--font-display)", textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
-                                        <Shield size={16} /> {team.teamName}
-                                        {team.teamNumber && <span className="badge badge-gold text-xs">#{team.teamNumber}</span>}
-                                    </p>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <p className="text-xs font-bold flex items-center gap-2" style={{ color: "var(--accent-amber)", fontFamily: "var(--font-display)", textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
+                                            <Shield size={16} /> {team.teamName}
+                                            {team.teamNumber && <span className="badge badge-gold text-xs">#{team.teamNumber}</span>}
+                                        </p>
+                                        <button 
+                                            onClick={() => handleEditToggle(team._id, team)}
+                                            className="text-gray-400 hover:text-white transition-colors"
+                                            title="Edit Tracing Data"
+                                        >
+                                            <Edit3 size={14} />
+                                        </button>
+                                    </div>
+
+                                    {/* Edit Tracing Metadata */}
+                                    {editingTeam === team._id && (
+                                        <div className="mb-4 p-3 rounded-xl border border-orange-500/20 bg-orange-500/5 grid grid-cols-1 md:grid-cols-3 gap-3 animate-fade-in">
+                                            <div>
+                                                <label className="text-[10px] uppercase font-bold text-gray-400 mb-1 flex items-center gap-1">
+                                                    <MapPin size={10} /> Room
+                                                </label>
+                                                <input 
+                                                    type="text" 
+                                                    value={editData.roomNumber} 
+                                                    onChange={e => setEditData({...editData, roomNumber: e.target.value})}
+                                                    className="w-full bg-black/50 border border-white/10 rounded overflow-hidden text-xs p-1.5 focus:border-orange-500/50 outline-none"
+                                                    placeholder="E.g. AL-204"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] uppercase font-bold text-gray-400 mb-1 flex items-center gap-1">
+                                                    <Monitor size={10} /> Domain
+                                                </label>
+                                                <input 
+                                                    type="text" 
+                                                    value={editData.domain} 
+                                                    onChange={e => setEditData({...editData, domain: e.target.value})}
+                                                    className="w-full bg-black/50 border border-white/10 rounded overflow-hidden text-xs p-1.5 focus:border-orange-500/50 outline-none"
+                                                    placeholder="E.g. Web3, AI"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col justify-between">
+                                                <label className="text-[10px] uppercase font-bold text-gray-400 mb-1 flex items-center gap-1">
+                                                    <Plug size={10} /> Extension
+                                                </label>
+                                                <div className="flex items-center justify-between">
+                                                    <button 
+                                                        onClick={() => setEditData({...editData, extensionBoard: !editData.extensionBoard})}
+                                                        className={`text-xs px-2 py-1 rounded border transition-colors ${editData.extensionBoard ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-black/50 border-white/10 text-gray-400 hover:border-white/30'}`}
+                                                    >
+                                                        {editData.extensionBoard ? "Provided" : "Needed"}
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleSaveMetadata(team._id)}
+                                                        className="text-xs bg-orange-600 hover:bg-orange-500 text-white font-bold py-1 px-3 rounded flex items-center gap-1"
+                                                    >
+                                                        <Save size={12} /> Save
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Tracing Data Display (Read Only) */}
+                                    {editingTeam !== team._id && (team.roomNumber || team.domain || team.extensionBoard) && (
+                                        <div className="flex flex-wrap gap-2 mb-3">
+                                            {team.roomNumber && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1"><MapPin size={10}/> Room {team.roomNumber}</span>}
+                                            {team.domain && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1"><Monitor size={10}/> {team.domain}</span>}
+                                            {team.extensionBoard && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 flex items-center gap-1"><Plug size={10}/> Extension Board</span>}
+                                        </div>
+                                    )}
 
                                     {/* Leader */}
                                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl mb-2" style={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.05)" }}>
