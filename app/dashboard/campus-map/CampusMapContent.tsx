@@ -67,11 +67,14 @@ export default function CampusMapContent() {
     const zonesLayerRef = useRef<L.FeatureGroup | null>(null);
     const [isLoadingZones, setIsLoadingZones] = useState(false);
     const [highlightedAreaId, setHighlightedAreaId] = useState<string | null>(null);
+    const [isNavigating, setIsNavigating] = useState(false);
+    const navigationLayerRef = useRef<L.LayerGroup | null>(null);
 
     // Filter areas by search
     const filteredAreas = campusAreas.filter(
         (a) =>
             a.id !== "campus-boundary" &&
+            !a.hidden &&
             (a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 a.description.toLowerCase().includes(searchQuery.toLowerCase()))
     );
@@ -125,7 +128,7 @@ export default function CampusMapContent() {
 
         // Draw all buildings/areas
         for (const area of campusAreas) {
-            if (area.id === "campus-boundary") continue;
+            if (area.id === "campus-boundary" || area.hidden) continue;
 
             const centLat = area.coordinates.reduce((s, c) => s + c[0], 0) / area.coordinates.length;
             const centLng = area.coordinates.reduce((s, c) => s + c[1], 0) / area.coordinates.length;
@@ -193,11 +196,13 @@ export default function CampusMapContent() {
 
         // Create a layer group for custom zones
         zonesLayerRef.current = L.featureGroup().addTo(map);
+        navigationLayerRef.current = L.layerGroup().addTo(map);
 
         return () => {
             map.remove();
             mapRef.current = null;
             zonesLayerRef.current = null;
+            navigationLayerRef.current = null;
         };
     }, []);
 
@@ -465,14 +470,27 @@ export default function CampusMapContent() {
         }
     }, []);
 
-    // Cleanup on unmount
+    // Effect: Handle navigation path rendering
     useEffect(() => {
-        return () => {
-            if (watchIdRef.current !== null) {
-                navigator.geolocation.clearWatch(watchIdRef.current);
+        if (!navigationLayerRef.current || !mapRef.current) return;
+        navigationLayerRef.current.clearLayers();
+
+        if (isNavigating) {
+            const navPath = campusAreas.find(a => a.id === 'direction-path');
+            if (navPath) {
+                const polyline = L.polyline(navPath.coordinates, {
+                    color: navPath.color,
+                    weight: 5,
+                    opacity: 1,
+                    dashArray: '10, 10',
+                    className: 'nav-path-animation'
+                }).addTo(navigationLayerRef.current);
+
+                // Fit bounds to path
+                mapRef.current.flyToBounds(polyline.getBounds(), { padding: [50, 50], duration: 1.5 });
             }
-        };
-    }, []);
+        }
+    }, [isNavigating]);
 
     return (
         <div className="relative w-full" style={{ height: "100vh", background: "#0a0a0f" }}>
@@ -846,15 +864,37 @@ export default function CampusMapContent() {
                             </div>
                         )}
 
-                        <div className="flex items-center gap-2 mt-4">
-                            <div className="w-3 h-3 shrink-0 rounded-full" style={{ background: selectedArea.color }} />
-                            <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold truncate">
-                                {categoryColors[selectedArea.category]?.label || selectedArea.category}
-                            </span>
+                        <div className="flex flex-col gap-2 mt-4">
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 shrink-0 rounded-full" style={{ background: selectedArea.color }} />
+                                <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold truncate">
+                                    {categoryColors[selectedArea.category]?.label || selectedArea.category}
+                                </span>
+                            </div>
+
+                            <button
+                                onClick={() => setIsNavigating(!isNavigating)}
+                                className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all ${isNavigating ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:bg-orange-600'}`}
+                            >
+                                <Navigation size={14} className={isNavigating ? "animate-pulse" : ""} />
+                                {isNavigating ? "Stop Navigation" : "Get Directions"}
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Navigation Path Layer */}
+            <style jsx global>{`
+                @keyframes dash {
+                    to {
+                        stroke-dashoffset: -20;
+                    }
+                }
+                .nav-path-animation {
+                    animation: dash 1.5s linear infinite;
+                }
+            `}</style>
         </div>
     );
 }
