@@ -3,7 +3,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { Shield, Check, ClipboardList, Search, Edit3, Save, Plug, Monitor, MapPin, Users } from "lucide-react";
-import { teamsApi, SOCKET_URL } from "@/lib/api";
+import { teamsApi, SOCKET_URL, statsApi } from "@/lib/api";
 import { io } from "socket.io-client";
 
 export default function CheckinPage() {
@@ -24,18 +24,26 @@ export default function CheckinPage() {
             
             // If it was a check-in, add to recent
             if (updatedTeam.checkedIn) {
-                setRecentCheckins(prev => {
-                    // Avoid duplicates if we already added it locally
-                    if (prev.some(r => r.team === updatedTeam.teamName && r.time === new Date(updatedTeam.checkedInAt).toLocaleTimeString())) {
-                        return prev;
-                    }
-                    return [
-                        { name: updatedTeam.leaderName, team: updatedTeam.teamName, time: new Date(updatedTeam.checkedInAt).toLocaleTimeString() },
-                        ...prev.slice(0, 19)
-                    ];
-                });
+                setRecentCheckins(prev => [
+                    { name: updatedTeam.leaderName, team: updatedTeam.teamName, time: new Date(updatedTeam.checkedInAt).toLocaleTimeString() },
+                    ...prev.slice(0, 19)
+                ]);
             }
         });
+
+        const fetchInitialData = async () => {
+            try {
+                const [statsRes, teamsRes] = await Promise.all([
+                    statsApi.get(),
+                    teamsApi.list({ limit: "20" })
+                ]);
+                setStats({ total: statsRes.teams.total, checkedIn: statsRes.teams.checkedIn });
+                setResults(teamsRes.teams || []);
+            } catch (err) {
+                console.error("Initial load error:", err);
+            }
+        };
+        fetchInitialData();
 
         return () => {
             socket.disconnect();
@@ -43,19 +51,20 @@ export default function CheckinPage() {
     }, []);
 
     const searchParticipants = useCallback(async (query: string) => {
-        if (!query.trim()) { 
-            setResults([]); 
-            setStats({ total: 0, checkedIn: 0 });
-            return; 
-        }
         setLoading(true);
         try {
-            const data = await teamsApi.list({ search: query, limit: "20" });
+            const params: any = { limit: "20" };
+            if (query.trim()) params.search = query;
+            
+            const data = await teamsApi.list(params);
             setResults(data.teams || []);
-            setStats({ 
-                total: data.pagination?.total || 0, 
-                checkedIn: (data.teams || []).filter((t: any) => t.checkedIn).length 
-            });
+            
+            // Keep total stats correct from the list response if available, or just rely on mount/socket
+            if (data.pagination) {
+                // We keep the checkedIn count from the global stats for the sidebar, 
+                // but maybe update total if it changed
+                setStats(prev => ({ ...prev, total: data.pagination.total }));
+            }
         } catch (err) {
             console.error("Search error:", err);
             setResults([]);

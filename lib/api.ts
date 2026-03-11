@@ -119,7 +119,7 @@ export const teamsApi = {
 export const statsApi = {
     get: () =>
         apiFetch<{
-            teams: { total: number; complete: number; incomplete: number };
+            teams: { total: number; complete: number; incomplete: number; checkedIn: number };
             participants: { total: number; checkedIn: number; notCheckedIn: number };
             batchBreakdown: Record<string, number>;
             courseBreakdown: Record<string, number>;
