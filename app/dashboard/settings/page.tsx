@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Lock, Download, Upload, UserPlus, ScrollText, CheckCircle, AlertTriangle, Database } from "lucide-react";
-import { settingsApi, teamsApi, authApi, participantAdminApi } from "@/lib/api";
+import { settingsApi, teamsApi, authApi } from "@/lib/api";
 
 export default function SettingsPage() {
     const [settings, setSettings] = useState<any>(null);
@@ -174,34 +174,6 @@ export default function SettingsPage() {
         }
     };
 
-    const handleGeneratePasswords = async () => {
-        if (!confirm("Are you sure you want to generate passwords for all participants lacking one?")) return;
-        setActionLoading(true);
-        try {
-            const res = await participantAdminApi.generatePasswords();
-            alert(`Successfully generated passwords for ${res.generated} participants.`);
-            loadLogs();
-        } catch (error: any) {
-            alert(error.message || "Failed to generate passwords");
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
-    const handleSendEmails = async () => {
-        if (!confirm("Are you sure you want to email credentials to all participants? This will send actual emails.")) return;
-        setActionLoading(true);
-        try {
-            const res = await participantAdminApi.sendEmails();
-            alert(`Emails sent successfully. Count: ${res.message}`);
-            loadLogs();
-        } catch (error: any) {
-            alert(error.message || "Failed to send emails");
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
     return (
         <div className="page-container animate-fade-in pb-24 md:pb-0">
             {/* Header */}
@@ -309,31 +281,6 @@ export default function SettingsPage() {
                                 {importResult.message}
                             </p>
                         )}
-
-                        <div className="mt-6 pt-6 border-t border-white/10">
-                            <h3 className="text-sm font-semibold uppercase tracking-wider mb-2 text-white flex items-center gap-2">
-                                <Lock size={16} className="text-orange-400" /> Participant Tracking Credentials
-                            </h3>
-                            <p className="text-xs text-gray-400 mb-4">
-                                Generate and email 9-character passkeys for all imported participants.
-                            </p>
-                            <div className="flex gap-4">
-                                <button
-                                    onClick={handleGeneratePasswords}
-                                    disabled={actionLoading}
-                                    className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
-                                >
-                                    {actionLoading ? "Processing..." : "Generate Passwords"}
-                                </button>
-                                <button
-                                    onClick={handleSendEmails}
-                                    disabled={actionLoading}
-                                    className="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
-                                >
-                                    {actionLoading ? "Processing..." : "Email Credentials"}
-                                </button>
-                            </div>
-                        </div>
                     </div>
 
                     {/* Create Admin */}
