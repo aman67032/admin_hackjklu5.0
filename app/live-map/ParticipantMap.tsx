@@ -6,7 +6,7 @@ import "leaflet/dist/leaflet.css";
 import { campusAreas, CAMPUS_CENTER, CAMPUS_ZOOM } from "../dashboard/campus-map/campus-map-data";
 import { MapPin, Navigation, Locate, AlertTriangle } from "lucide-react";
 import { mapZonesApi, participantAuthApi } from "@/lib/api";
-import { CustomFloorZone } from "../dashboard/map-builder/map-builder-data";
+import { CustomFloorZone } from "../dashboard/campus-map/campus-map-data";
 
 export default function ParticipantMap() {
     const mapContainerRef = useRef<HTMLDivElement>(null);

@@ -10,7 +10,7 @@ import { io, Socket } from "socket.io-client";
 import { campusAreas, CAMPUS_CENTER, CAMPUS_ZOOM } from "../campus-map/campus-map-data";
 import { MapPin, Navigation, Locate, AlertTriangle, Users, AlertOctagon, RotateCcw } from "lucide-react";
 import { participantAdminApi, mapZonesApi } from "@/lib/api";
-import { CustomFloorZone } from "../map-builder/map-builder-data";
+import { CustomFloorZone } from "../campus-map/campus-map-data";
 
 interface TrackingLocation {
     teamId: string;

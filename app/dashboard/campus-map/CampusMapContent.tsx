@@ -3,10 +3,9 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { campusAreas, CAMPUS_CENTER, CAMPUS_ZOOM, categoryColors, CampusArea } from "./campus-map-data";
+import { campusAreas, CAMPUS_CENTER, CAMPUS_ZOOM, categoryColors, CampusArea, CustomFloorZone } from "./campus-map-data";
 import { MapPin, Navigation, Search, ChevronDown, ChevronUp, Layers, X, Locate, Info, Loader2 } from "lucide-react";
 import { mapZonesApi } from "@/lib/api";
-import { CustomFloorZone, ZONE_TYPE_COLORS } from "../map-builder/map-builder-data";
 
 // Point-in-polygon ray casting
 function isPointInPolygon(point: [number, number], polygon: [number, number][]): boolean {

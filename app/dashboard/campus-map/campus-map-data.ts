@@ -13,6 +13,18 @@ export interface CampusArea {
     icon: string;
 }
 
+export interface CustomFloorZone {
+  id: string;
+  name: string;
+  description: string;
+  zoneType: string;
+  coordinates: [number, number][];
+  color: string;
+  fillColor: string;
+  floorLevel: string;
+  parentBuildingId: string;
+}
+
 // Campus center for initial map view
 export const CAMPUS_CENTER: [number, number] = [26.83550, 75.65100];
 export const CAMPUS_ZOOM = 17;
