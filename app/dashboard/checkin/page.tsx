@@ -196,109 +196,116 @@ export default function CheckinPage() {
                                         </div>
 
                                         <button
+                                            disabled={team.checkedIn}
                                             onClick={() => toggleTeamCheckin(team._id, team.teamName, team.leaderName)}
-                                            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all transform active:scale-95 ${team.checkedIn
-                                                ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
-                                                : 'bg-orange-600 hover:bg-orange-500 text-white shadow-[0_0_20px_rgba(232,98,26,0.3)]'
+                                            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all transform ${team.checkedIn
+                                                ? 'bg-green-600/50 text-white/70 cursor-not-allowed border border-green-500/30'
+                                                : 'bg-orange-600 hover:bg-orange-500 text-white shadow-[0_0_20px_rgba(232,98,26,0.3)] active:scale-95'
                                                 } flex items-center justify-center gap-2 w-full md:w-auto`}
                                         >
-                                            {team.checkedIn ? <><Check size={18} /> TEAM CHECKED IN</> : "CHECK IN TEAM →"}
+                                            {team.checkedIn ? <><Check size={18} /> ENTRY GRANTED</> : "CHECK IN TEAM →"}
                                         </button>
                                     </div>
 
-                                    {/* Logistical Metadata Panel */}
-                                    <div className="p-4 rounded-xl relative overflow-hidden" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                                                <ClipboardList size={14} /> Logistical Details
-                                            </h3>
-                                            <button 
-                                                onClick={() => handleEditToggle(team._id, team)}
-                                                className="text-[10px] font-bold uppercase tracking-widest text-orange-400 hover:text-orange-300 transition-colors flex items-center gap-1"
-                                            >
-                                                {editingTeam === team._id ? "Cancel" : <><Edit3 size={12} /> Edit Details</>}
-                                            </button>
-                                        </div>
+                                    {/* Logistical Metadata Panel — Only show after check-in */}
+                                    {team.checkedIn ? (
+                                        <div className="p-4 rounded-xl relative overflow-hidden mt-2" style={{ background: "#000000", border: "2px solid rgba(232, 98, 26, 0.3)" }}>
+                                            <div className="flex justify-between items-center mb-4">
+                                                <h3 className="text-[10px] font-bold uppercase tracking-widest text-orange-400 flex items-center gap-2">
+                                                    <ClipboardList size={14} /> Logistical Coordination
+                                                </h3>
+                                                <button 
+                                                    onClick={() => handleEditToggle(team._id, team)}
+                                                    className="text-[10px] font-bold uppercase tracking-widest text-white hover:text-orange-400 transition-colors flex items-center gap-1 bg-white/5 px-2 py-1 rounded"
+                                                >
+                                                    {editingTeam === team._id ? "Cancel" : <><Edit3 size={12} /> Edit Assignment</>}
+                                                </button>
+                                            </div>
 
-                                        {editingTeam === team._id ? (
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
-                                                <div className="space-y-1">
-                                                    <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">Room Assignment</label>
-                                                    <div className="relative">
-                                                        <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                                                        <input 
-                                                            type="text" 
-                                                            value={editData.roomNumber} 
-                                                            onChange={e => setEditData({...editData, roomNumber: e.target.value})}
-                                                            className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm focus:border-orange-500/50 outline-none transition-all"
-                                                            placeholder="E.g. AL-204"
-                                                        />
+                                            {editingTeam === team._id ? (
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
+                                                    <div className="space-y-1">
+                                                        <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">Room Assignment</label>
+                                                        <div className="relative">
+                                                            <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" />
+                                                            <input 
+                                                                type="text" 
+                                                                value={editData.roomNumber} 
+                                                                onChange={e => setEditData({...editData, roomNumber: e.target.value})}
+                                                                className="w-full bg-[#0a0a0a] border-2 border-orange-500/40 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:border-orange-500 outline-none transition-all shadow-inner"
+                                                                placeholder="E.g. AL-204"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">Tech Domain</label>
+                                                        <div className="relative">
+                                                            <Monitor size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" />
+                                                            <input 
+                                                                type="text" 
+                                                                value={editData.domain} 
+                                                                onChange={e => setEditData({...editData, domain: e.target.value})}
+                                                                className="w-full bg-[#0a0a0a] border-2 border-orange-500/40 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:border-orange-500 outline-none transition-all shadow-inner"
+                                                                placeholder="E.g. Web3, AI"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col justify-end gap-2">
+                                                        <div className="flex items-center justify-between gap-3">
+                                                            <button 
+                                                                onClick={() => setEditData({...editData, extensionBoard: !editData.extensionBoard})}
+                                                                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg border-2 text-xs font-bold transition-all ${editData.extensionBoard ? 'bg-orange-500/20 border-orange-500 text-orange-400' : 'bg-[#0a0a0a] border-white/10 text-gray-400 hover:border-orange-500/50'}`}
+                                                            >
+                                                                <Plug size={14} /> {editData.extensionBoard ? "Extension Provided" : "Add Board"}
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleSaveMetadata(team._id)}
+                                                                className="bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 shadow-lg shadow-orange-900/20 transition-all border-2 border-orange-400"
+                                                            >
+                                                                <Save size={14} /> Update
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">Tech Domain</label>
-                                                    <div className="relative">
-                                                        <Monitor size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                                                        <input 
-                                                            type="text" 
-                                                            value={editData.domain} 
-                                                            onChange={e => setEditData({...editData, domain: e.target.value})}
-                                                            className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm focus:border-orange-500/50 outline-none transition-all"
-                                                            placeholder="E.g. Web3, AI"
-                                                        />
+                                            ) : (
+                                                <div className="flex flex-wrap gap-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`p-2 rounded-lg ${team.roomNumber ? 'bg-orange-500/20 text-orange-400' : 'bg-white/5 text-gray-600'}`}>
+                                                            <MapPin size={16} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] uppercase font-bold text-gray-500">Room</p>
+                                                            <p className="text-sm font-bold text-white">{team.roomNumber || "Not Assigned"}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="h-8 w-px bg-white/10 self-center mx-2 hidden md:block" />
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`p-2 rounded-lg ${team.domain ? 'bg-orange-500/20 text-orange-400' : 'bg-white/5 text-gray-600'}`}>
+                                                            <Monitor size={16} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] uppercase font-bold text-gray-500">Domain</p>
+                                                            <p className="text-sm font-bold text-white">{team.domain || "N/A"}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="h-8 w-px bg-white/10 self-center mx-2 hidden md:block" />
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`p-2 rounded-lg ${team.extensionBoard ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-gray-600'}`}>
+                                                            <Plug size={16} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] uppercase font-bold text-gray-500">Hardware</p>
+                                                            <p className="text-sm font-bold text-white">{team.extensionBoard ? "Board Provided" : "No Board"}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex flex-col justify-end gap-2">
-                                                    <div className="flex items-center justify-between gap-3">
-                                                        <button 
-                                                            onClick={() => setEditData({...editData, extensionBoard: !editData.extensionBoard})}
-                                                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg border text-xs font-bold transition-all ${editData.extensionBoard ? 'bg-green-500/20 border-green-500/40 text-green-400' : 'bg-black/40 border-white/10 text-gray-500 hover:border-white/20'}`}
-                                                        >
-                                                            <Plug size={14} /> {editData.extensionBoard ? "Board Provided" : "Request Board"}
-                                                        </button>
-                                                        <button 
-                                                            onClick={() => handleSaveMetadata(team._id)}
-                                                            className="bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 shadow-lg shadow-orange-900/20 transition-all"
-                                                        >
-                                                            <Save size={14} /> Save
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-wrap gap-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`p-2 rounded-lg ${team.roomNumber ? 'bg-blue-500/10 text-blue-400' : 'bg-white/5 text-gray-600'}`}>
-                                                        <MapPin size={16} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[10px] uppercase font-bold text-gray-500">Room</p>
-                                                        <p className="text-sm font-bold text-white">{team.roomNumber || "Not Assigned"}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="h-8 w-px bg-white/5 self-center mx-2 hidden md:block" />
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`p-2 rounded-lg ${team.domain ? 'bg-purple-500/10 text-purple-400' : 'bg-white/5 text-gray-600'}`}>
-                                                        <Monitor size={16} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[10px] uppercase font-bold text-gray-500">Domain</p>
-                                                        <p className="text-sm font-bold text-white">{team.domain || "N/A"}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="h-8 w-px bg-white/5 self-center mx-2 hidden md:block" />
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`p-2 rounded-lg ${team.extensionBoard ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-gray-600'}`}>
-                                                        <Plug size={16} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[10px] uppercase font-bold text-gray-500">Hardware</p>
-                                                        <p className="text-sm font-bold text-white">{team.extensionBoard ? "Extension Board Provided" : "No Board Assigned"}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="p-3 text-center border border-dashed border-white/5 rounded-xl">
+                                            <p className="text-[10px] text-gray-600 uppercase tracking-widest font-medium">Logistics available after check-in</p>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>

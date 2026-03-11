@@ -259,16 +259,17 @@ h6 {
 
 /* Form inputs */
 .input-olympus {
-  background: var(--navy-light);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 16px;
-  color: var(--text-primary);
+  background: #18181b;
+  border: 1px solid rgba(232, 98, 26, 0.4);
+  border-radius: 10px;
+  padding: 12px 18px;
+  color: #ffffff;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 15px;
   width: 100%;
   transition: all 0.3s ease;
   outline: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .input-olympus::placeholder {
@@ -282,21 +283,22 @@ h6 {
 
 /* Select dropdown */
 .select-olympus {
-  background: var(--navy-light);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 16px;
-  color: var(--text-primary);
+  background: #18181b;
+  border: 1px solid rgba(232, 98, 26, 0.4);
+  border-radius: 10px;
+  padding: 10px 18px;
+  color: #ffffff;
   font-family: var(--font-body);
   font-size: 14px;
   cursor: pointer;
   outline: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23d4a843' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 12px center;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e8621a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 14px center;
   background-repeat: no-repeat;
-  background-size: 16px;
-  padding-right: 40px;
+  background-size: 18px;
+  padding-right: 44px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .select-olympus:focus {

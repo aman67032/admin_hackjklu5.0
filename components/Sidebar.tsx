@@ -10,7 +10,6 @@ const navItems = [
     { href: "/dashboard/registrations", icon: <ScrollText size={18} />, label: "Registrations", greekName: "The Registry" },
     { href: "/dashboard/teams", icon: <Shield size={18} />, label: "Teams", greekName: "Armies" },
     { href: "/dashboard/checkin", icon: <Landmark size={18} />, label: "Check-in", greekName: "The Gates" },
-    { href: "/dashboard/exports", icon: <ClipboardList size={18} />, label: "Exports", greekName: "Scrolls" },
     { href: "/dashboard/settings", icon: <Settings size={18} />, label: "Settings", greekName: "Oracle" },
 ];
 

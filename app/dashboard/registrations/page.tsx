@@ -11,7 +11,7 @@ export default function RegistrationsPage() {
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState({ city: "", college: "", checkedIn: "" });
     const [viewMode, setViewMode] = useState<"team" | "individual">("team");
-    const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+    const [metadata, setMetadata] = useState<{ cities: string[]; colleges: string[] }>({ cities: [], colleges: [] });
 
     const loadTeams = useCallback(async (page = 1) => {
         setLoading(true);
@@ -30,16 +30,33 @@ export default function RegistrationsPage() {
         }
     }, [search, filters]);
 
-    useEffect(() => { loadTeams(); }, [loadTeams]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const meta = await teamsApi.getMetadata();
+                setMetadata(meta);
+            } catch (err) {
+                console.error("Metadata fetch error:", err);
+            }
+        };
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            loadTeams(pagination.page);
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [search, filters, pagination.page, loadTeams]);
 
     const handleSearchChange = (val: string) => {
         setSearch(val);
-        if (searchTimeout) clearTimeout(searchTimeout);
-        setSearchTimeout(setTimeout(() => loadTeams(1), 400));
+        setPagination(prev => ({ ...prev, page: 1 }));
     };
 
     const handleFilterChange = (key: string, value: string) => {
         setFilters(prev => ({ ...prev, [key]: value }));
+        setPagination(prev => ({ ...prev, page: 1 }));
     };
 
     const toggleCheckin = async (teamId: string) => {
@@ -75,17 +92,8 @@ export default function RegistrationsPage() {
         }
     };
 
-    // Collect unique cities and colleges for filter dropdowns
-    const allCities = new Set<string>();
-    const allColleges = new Set<string>();
-    teams.forEach(team => {
-        if (team.leaderCity) allCities.add(team.leaderCity);
-        if (team.leaderCollege) allColleges.add(team.leaderCollege);
-        team.members?.forEach((m: any) => {
-            if (m.city) allCities.add(m.city);
-            if (m.college) allColleges.add(m.college);
-        });
-    });
+    const allCities = metadata.cities;
+    const allColleges = metadata.colleges;
 
     // Flatten teams into participants for individual view
     const participants = viewMode === "individual"

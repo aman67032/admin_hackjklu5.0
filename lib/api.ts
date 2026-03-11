@@ -87,6 +87,7 @@ export const teamsApi = {
         }>(`/teams${query}`);
     },
     get: (id: string) => apiFetch<any>(`/teams/${id}`),
+    getMetadata: () => apiFetch<{ cities: string[]; colleges: string[] }>('/teams/metadata'),
     update: (id: string, data: any) =>
         apiFetch<any>(`/teams/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: string) =>

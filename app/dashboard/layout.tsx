@@ -32,10 +32,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { icon: <ScrollText size={22} />, label: 'Registrations', onClick: () => router.push('/dashboard/registrations'), className: pathname.startsWith('/dashboard/registrations') ? 'bg-orange-500/20 border-orange-400' : '' },
         { icon: <Shield size={22} />, label: 'Teams', onClick: () => router.push('/dashboard/teams'), className: pathname.startsWith('/dashboard/teams') ? 'bg-orange-500/20 border-orange-400' : '' },
         { icon: <Landmark size={22} />, label: 'Check-in', onClick: () => router.push('/dashboard/checkin'), className: pathname.startsWith('/dashboard/checkin') ? 'bg-orange-500/20 border-orange-400' : '' },
-        { icon: <ClipboardList size={22} />, label: 'Exports', onClick: () => router.push('/dashboard/exports'), className: pathname.startsWith('/dashboard/exports') ? 'bg-orange-500/20 border-orange-400' : '' },
         { icon: <Globe size={22} />, label: 'Geography', onClick: () => router.push('/dashboard/geography'), className: pathname.startsWith('/dashboard/geography') ? 'bg-orange-500/20 border-orange-400' : '' },
         { icon: <MapPin size={22} />, label: 'Campus Map', onClick: () => router.push('/dashboard/campus-map'), className: pathname.startsWith('/dashboard/campus-map') ? 'bg-orange-500/20 border-orange-400' : '' },
-        { icon: <MapPin size={22} />, label: 'Map Builder', onClick: () => router.push('/dashboard/map-builder'), className: pathname.startsWith('/dashboard/map-builder') ? 'bg-orange-500/20 border-orange-400' : '' },
         { icon: <Settings size={22} />, label: 'Settings', onClick: () => router.push('/dashboard/settings'), className: pathname.startsWith('/dashboard/settings') ? 'bg-orange-500/20 border-orange-400' : '' },
         { icon: <LogOut size={22} />, label: 'Logout', onClick: handleLogout, className: 'border-red-500/50 hover:bg-red-500/20 transition-colors' },
     ], [router, pathname]);

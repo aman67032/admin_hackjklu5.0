@@ -241,9 +241,8 @@ export default function GreekScene() {
     const pathname = usePathname();
     const [fov, setFov] = useState(40);
 
-    // Completely disable 3D background on Map Builder as it's full-screen 
+    // Completely disable 3D background on routes that are full-screen 
     // and causes performance/visibility conflicts.
-    if (pathname === '/dashboard/map-builder') return null;
 
     useEffect(() => {
         // Significantly increase FOV on smaller screens so the pillars still fit
