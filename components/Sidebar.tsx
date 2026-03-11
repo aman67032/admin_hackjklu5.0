@@ -11,7 +11,6 @@ const navItems = [
     { href: "/dashboard/teams", icon: <Shield size={18} />, label: "Teams", greekName: "Armies" },
     { href: "/dashboard/checkin", icon: <Landmark size={18} />, label: "Check-in", greekName: "The Gates" },
     { href: "/dashboard/exports", icon: <ClipboardList size={18} />, label: "Exports", greekName: "Scrolls" },
-    { href: "/dashboard/map-builder", icon: <MapPin size={18} />, label: "Map Builder", greekName: "Architect" },
     { href: "/dashboard/tracking", icon: <MapPin size={18} />, label: "Live Tracking", greekName: "Eagle Eye" },
     { href: "/dashboard/settings", icon: <Settings size={18} />, label: "Settings", greekName: "Oracle" },
 ];
