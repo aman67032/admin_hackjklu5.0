@@ -7,15 +7,43 @@ import { teamsApi } from "@/lib/api";
 export default function TeamsPage() {
     const [teams, setTeams] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedSize, setSelectedSize] = useState<string>("");
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [metadata, setMetadata] = useState<{ sizeCounts: Record<number, number> }>({ sizeCounts: {} });
     const [editingTeam, setEditingTeam] = useState<string | null>(null);
-    const [editData, setEditData] = useState<{ teamNumber: string; roomNumber: string; status: string }>({ teamNumber: "", roomNumber: "", status: "" });
+    const [editData, setEditData] = useState<{ 
+        teamName: string;
+        teamNumber: string; 
+        roomNumber: string; 
+        status: string;
+        domain: string;
+        members: any[];
+    }>({ teamName: "", teamNumber: "", roomNumber: "", status: "", domain: "", members: [] });
+    
+    // Member sub-form state
+    const [memberForm, setMemberForm] = useState<any | null>(null); // { index: number | 'new', data: any }
+
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(search), 500);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    const loadMetadata = async () => {
+        try {
+            const data = await teamsApi.getMetadata();
+            setMetadata(data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const loadTeams = useCallback(async () => {
         setLoading(true);
         try {
             const params: Record<string, string> = { limit: "200" };
-            if (search) params.search = search;
+            if (debouncedSearch) params.search = debouncedSearch;
+            if (selectedSize) params.teamSize = selectedSize;
             const data = await teamsApi.list(params);
             setTeams(data.teams);
         } catch (err) {
@@ -23,24 +51,89 @@ export default function TeamsPage() {
         } finally {
             setLoading(false);
         }
-    }, [search]);
+    }, [debouncedSearch, selectedSize]);
 
+    useEffect(() => { loadMetadata(); }, []);
     useEffect(() => { loadTeams(); }, [loadTeams]);
 
     const handleEdit = (team: any) => {
         setEditingTeam(team._id);
-        setEditData({ teamNumber: team.teamNumber || "", roomNumber: team.roomNumber || "", status: team.status });
+        setEditData({ 
+            teamName: team.teamName,
+            teamNumber: team.teamNumber || "", 
+            roomNumber: team.roomNumber || "", 
+            status: team.status,
+            domain: team.domain || "",
+            members: [...team.members]
+        });
+        setMemberForm(null);
     };
 
     const saveEdit = async (teamId: string) => {
         try {
             await teamsApi.update(teamId, {
+                teamName: editData.teamName,
                 teamNumber: editData.teamNumber ? Number(editData.teamNumber) : undefined,
                 roomNumber: editData.roomNumber,
                 status: editData.status,
+                domain: editData.domain,
+                members: editData.members,
             });
             setEditingTeam(null);
             loadTeams();
+            loadMetadata();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleRemoveMember = (idx: number) => {
+        setEditData(prev => ({
+            ...prev,
+            members: prev.members.filter((_, i) => i !== idx)
+        }));
+    };
+
+    const handleOpenMemberForm = (idx: number | 'new', existingData?: any) => {
+        setMemberForm({
+            index: idx,
+            data: existingData || {
+                name: "",
+                email: "",
+                phone: "",
+                college: "",
+                batch: "",
+                course: "",
+                city: "",
+                gender: "",
+                messFood: false
+            }
+        });
+    };
+
+    const saveMemberForm = () => {
+        if (!memberForm) return;
+        const newMembers = [...editData.members];
+        if (memberForm.index === 'new') {
+            newMembers.push(memberForm.data);
+        } else {
+            newMembers[memberForm.index] = memberForm.data;
+        }
+        setEditData(prev => ({ ...prev, members: newMembers }));
+        setMemberForm(null);
+    };
+
+    const handleExport = async () => {
+        try {
+            const params: Record<string, string> = {};
+            if (search) params.search = search;
+            if (selectedSize) params.teamSize = selectedSize;
+            
+            const csvData = await teamsApi.list(params) as any; // Re-use list to get full filtered set, or call exportApi
+            // Actually exportsApi.teams is better for raw CSV
+            const { exportsApi, downloadCSV } = await import("@/lib/api");
+            const csv = await exportsApi.teams(params);
+            downloadCSV(csv, `teams_size_${selectedSize || 'all'}_${Date.now()}.csv`);
         } catch (err) {
             console.error(err);
         }
@@ -67,16 +160,48 @@ export default function TeamsPage() {
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="mb-8 md:mb-10 max-w-xl mx-auto relative group">
-                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-500/50 group-focus-within:text-orange-500 transition-colors" />
-                <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="input-olympus w-full pl-12 py-3 md:py-4 text-center placeholder:text-gray-500 text-sm"
-                    placeholder="Search for an army by name or email..."
-                />
+            {/* Filters & Search */}
+            <div className="mb-8 md:mb-12 max-w-4xl mx-auto space-y-6">
+                <div className="flex flex-wrap justify-center gap-3">
+                    <button 
+                        onClick={() => setSelectedSize("")}
+                        className={`px-6 py-2 rounded-full text-xs font-bold transition-all duration-300 border ${!selectedSize ? 'bg-orange-500 text-white border-orange-400' : 'bg-black/40 text-gray-400 border-white/10 hover:border-orange-500/50'}`}
+                    >
+                        ALL ARMIES
+                    </button>
+                    {[2, 3, 4, 5].map(size => (
+                        <button 
+                            key={size}
+                            onClick={() => setSelectedSize(size.toString())}
+                            className={`px-6 py-2 rounded-full text-xs font-bold transition-all duration-300 border flex items-center gap-2 ${selectedSize === size.toString() ? 'bg-orange-500 text-white border-orange-400 shadow-[0_0_15px_rgba(232,98,26,0.4)]' : 'bg-black/40 text-gray-400 border-white/10 hover:border-orange-500/50'}`}
+                        >
+                            {size} MEMBERS
+                            <span className="px-1.5 py-0.5 rounded-md bg-black/60 text-[10px] opacity-80">
+                                {metadata.sizeCounts[size] || 0}
+                            </span>
+                        </button>
+                    ))}
+                </div>
+
+                <div className="relative group">
+                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-500/50 group-focus-within:text-orange-500 transition-colors" />
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="input-olympus w-full pl-12 py-3 md:py-4 text-center placeholder:text-gray-500 text-sm"
+                        placeholder="Search for an army by name or email..."
+                    />
+                </div>
+
+                <div className="flex justify-center">
+                    <button 
+                        onClick={handleExport}
+                        className="btn-ghost text-[10px] uppercase tracking-widest px-8 py-3 font-bold border-orange-500/30 hover:border-orange-500"
+                    >
+                        Export Filtered Armies (CSV)
+                    </button>
+                </div>
             </div>
 
             {/* Teams Grid */}
@@ -119,17 +244,31 @@ export default function TeamsPage() {
                                 <div className="p-3 md:p-4 rounded-xl mb-6 space-y-3" style={{ background: "#0a0a0a", border: "1px solid rgba(232, 98, 26, 0.3)" }}>
                                     <div className="flex flex-col sm:flex-row gap-2">
                                         <input
+                                            value={editData.teamName}
+                                            onChange={(e) => setEditData(prev => ({ ...prev, teamName: e.target.value }))}
+                                            className="input-olympus text-sm py-2 bg-black/40 flex-[2]"
+                                            placeholder="Army Name"
+                                        />
+                                        <input
                                             type="number"
                                             value={editData.teamNumber}
                                             onChange={(e) => setEditData(prev => ({ ...prev, teamNumber: e.target.value }))}
-                                            className="input-olympus text-sm py-2 bg-black/40"
-                                            placeholder="Team #"
+                                            className="input-olympus text-sm py-2 bg-black/40 flex-1"
+                                            placeholder="Army #"
                                         />
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row gap-2">
                                         <input
                                             value={editData.roomNumber}
                                             onChange={(e) => setEditData(prev => ({ ...prev, roomNumber: e.target.value }))}
                                             className="input-olympus text-sm py-2 bg-black/40"
                                             placeholder="Room #"
+                                        />
+                                        <input
+                                            value={editData.domain}
+                                            onChange={(e) => setEditData(prev => ({ ...prev, domain: e.target.value }))}
+                                            className="input-olympus text-sm py-2 bg-black/40"
+                                            placeholder="Expertise"
                                         />
                                         <select
                                             value={editData.status}
@@ -141,8 +280,113 @@ export default function TeamsPage() {
                                             <option value="disqualified">Disqualified</option>
                                         </select>
                                     </div>
-                                    <div className="flex gap-2 pt-1 mt-2">
-                                        <button onClick={() => saveEdit(team._id)} className="btn-gold flex-1 text-[10px] uppercase font-bold px-4 py-2">Save</button>
+
+                                    {/* Member Management in Edit */}
+                                    <div className="mt-4 border-t border-white/10 pt-4 space-y-2">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-[10px] uppercase font-bold text-orange-400">Manage Members ({editData.members.length + 1}/5)</span>
+                                            {editData.members.length < 4 && (
+                                                <button 
+                                                    onClick={() => handleOpenMemberForm('new')}
+                                                    className="text-[10px] uppercase font-bold text-white bg-orange-600 px-2 py-1 rounded"
+                                                >
+                                                    + Add
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            {/* (Leader is immutable in this view, only members can be removed/replaced) */}
+                                            {editData.members.map((m, idx) => (
+                                                <div key={idx} className="flex items-center gap-2 p-1.5 rounded bg-white/5 border border-white/5 text-[10px]">
+                                                    <span className="text-gray-400 font-mono">M{idx+1}:</span>
+                                                    <span className="flex-1 truncate font-bold">{m.name}</span>
+                                                    <button onClick={() => handleOpenMemberForm(idx, m)} className="text-blue-400 hover:text-blue-300">Replace</button>
+                                                    <button onClick={() => handleRemoveMember(idx)} className="text-red-400 hover:text-red-300">Remove</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Sub-form for Member Details */}
+                                    {memberForm && (
+                                        <div className="mt-4 p-4 rounded-lg bg-orange-500/10 border border-orange-500/30 animate-scale-in">
+                                            <h4 className="text-[10px] uppercase font-bold mb-3 text-orange-400">
+                                                {memberForm.index === 'new' ? 'New Member Details' : 'Replace Member Details'}
+                                            </h4>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <input 
+                                                    placeholder="Name" 
+                                                    value={memberForm.data.name} 
+                                                    onChange={e => setMemberForm((prev: any) => ({ ...prev, data: { ...prev.data, name: e.target.value } }))}
+                                                    className="input-olympus text-[10px] py-1.5"
+                                                />
+                                                <input 
+                                                    placeholder="Email" 
+                                                    value={memberForm.data.email} 
+                                                    onChange={e => setMemberForm((prev: any) => ({ ...prev, data: { ...prev.data, email: e.target.value } }))}
+                                                    className="input-olympus text-[10px] py-1.5"
+                                                />
+                                                <input 
+                                                    placeholder="Phone" 
+                                                    value={memberForm.data.phone} 
+                                                    onChange={e => setMemberForm((prev: any) => ({ ...prev, data: { ...prev.data, phone: e.target.value } }))}
+                                                    className="input-olympus text-[10px] py-1.5"
+                                                />
+                                                <input 
+                                                    placeholder="College" 
+                                                    value={memberForm.data.college} 
+                                                    onChange={e => setMemberForm((prev: any) => ({ ...prev, data: { ...prev.data, college: e.target.value } }))}
+                                                    className="input-olympus text-[10px] py-1.5"
+                                                />
+                                                <input 
+                                                    placeholder="City" 
+                                                    value={memberForm.data.city} 
+                                                    onChange={e => setMemberForm((prev: any) => ({ ...prev, data: { ...prev.data, city: e.target.value } }))}
+                                                    className="input-olympus text-[10px] py-1.5"
+                                                />
+                                                <input 
+                                                    placeholder="Course" 
+                                                    value={memberForm.data.course} 
+                                                    onChange={e => setMemberForm((prev: any) => ({ ...prev, data: { ...prev.data, course: e.target.value } }))}
+                                                    className="input-olympus text-[10px] py-1.5"
+                                                />
+                                                <input 
+                                                    placeholder="Batch" 
+                                                    value={memberForm.data.batch} 
+                                                    onChange={e => setMemberForm((prev: any) => ({ ...prev, data: { ...prev.data, batch: e.target.value } }))}
+                                                    className="input-olympus text-[10px] py-1.5"
+                                                />
+                                                <select 
+                                                    value={memberForm.data.gender} 
+                                                    onChange={e => setMemberForm((prev: any) => ({ ...prev, data: { ...prev.data, gender: e.target.value } }))}
+                                                    className="select-olympus text-[10px] py-1"
+                                                >
+                                                    <option value="">Select Gender</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                                <div className="flex items-center gap-2 px-2">
+                                                    <input 
+                                                        type="checkbox"
+                                                        checked={memberForm.data.messFood}
+                                                        onChange={e => setMemberForm((prev: any) => ({ ...prev, data: { ...prev.data, messFood: e.target.checked } }))}
+                                                        className="w-3 h-3 accent-orange-500"
+                                                    />
+                                                    <span className="text-[10px] font-bold text-gray-400">Mess Food?</span>
+                                                </div>
+
+                                            </div>
+                                            <div className="flex gap-2 mt-3">
+                                                <button onClick={saveMemberForm} className="btn-gold flex-1 py-1 text-[10px]">OK</button>
+                                                <button onClick={() => setMemberForm(null)} className="btn-ghost flex-1 py-1 text-[10px]">Cancel</button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-2 pt-1 mt-4 border-t border-white/10 pt-4">
+                                        <button onClick={() => saveEdit(team._id)} className="btn-gold flex-1 text-[10px] uppercase font-bold px-4 py-2">Save Army</button>
                                         <button onClick={() => setEditingTeam(null)} className="btn-ghost flex-1 text-[10px] uppercase font-bold px-4 py-2">Cancel</button>
                                     </div>
                                 </div>
