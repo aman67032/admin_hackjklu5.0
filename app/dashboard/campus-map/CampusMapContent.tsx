@@ -285,19 +285,6 @@ export default function CampusMapContent() {
     // Start/Stop location tracking
     const toggleTracking = useCallback(() => {
         if (trackingActive) {
-            // Stop tracking
-            if (watchIdRef.current !== null) {
-                navigator.geolocation.clearWatch(watchIdRef.current);
-                watchIdRef.current = null;
-            }
-            if (locationMarkerRef.current && mapRef.current) {
-                mapRef.current.removeLayer(locationMarkerRef.current);
-                locationMarkerRef.current = null;
-            }
-            if (accuracyCircleRef.current && mapRef.current) {
-                mapRef.current.removeLayer(accuracyCircleRef.current);
-                accuracyCircleRef.current = null;
-            }
             setTrackingActive(false);
             setUserLocation(null);
             lastLocationRef.current = null;
@@ -319,117 +306,132 @@ export default function CampusMapContent() {
 
         setTrackingActive(true);
         setLocationError(null);
+    }, [trackingActive]);
 
-        const watchId = navigator.geolocation.watchPosition(
-            (position) => {
-                const { latitude, longitude, accuracy } = position.coords;
-
-                // Highly restrictive filtering for GPS bounce
-
-                // 1. Completely ignore terrible accuracy readings (> 30 meters)
-                if (accuracy > 30 && lastLocationRef.current) {
-                    return;
-                }
-
-                if (lastLocationRef.current && mapRef.current) {
-                    const dist = mapRef.current.distance(
-                        [lastLocationRef.current.lat, lastLocationRef.current.lng],
-                        [latitude, longitude]
-                    );
-
-                    // 2. Ignore movements smaller than 12 meters to prevent stationary bouncing 
-                    //    (unless the new reading is significantly more accurate)
-                    if (dist < 12 && accuracy >= lastLocationRef.current.accuracy - 5) {
-                        return;
-                    }
-
-                    // 3. If we jump a huge distance instantly, but accuracy is worse, it's likely a GPS glitch
-                    if (dist > 50 && accuracy > lastLocationRef.current.accuracy) {
-                        return;
-                    }
-                }
-
-                const newLoc = { lat: latitude, lng: longitude, accuracy };
-                lastLocationRef.current = newLoc;
-                setUserLocation(newLoc);
-
-                // Check if on campus
-                const campus = campusAreas.find((a) => a.id === "campus-boundary");
-                if (campus) {
-                    const onCampus = isPointInPolygon([latitude, longitude], campus.coordinates);
-                    setIsOnCampus(onCampus);
-                }
-
-                // Check which building user is in
-                let foundBuilding: string | null = null;
-                for (const area of campusAreas) {
-                    if (area.id === "campus-boundary" || area.type !== "polygon") continue;
-                    if (isPointInPolygon([latitude, longitude], area.coordinates)) {
-                        foundBuilding = area.name;
-                        break;
-                    }
-                }
-                setCurrentBuilding(foundBuilding);
-
-                // Find nearest building
-                const nearest = findNearestBuilding(latitude, longitude);
-                setNearestBuilding(nearest ? nearest.name : null);
-
-                // Update marker on map
-                if (mapRef.current) {
-                    if (!locationMarkerRef.current) {
-                        const pulsingIcon = L.divIcon({
-                            className: "user-location-marker",
-                            html: `<div class="user-dot-pulse"><div class="user-dot-core"></div></div>`,
-                            iconSize: [24, 24],
-                            iconAnchor: [12, 12],
-                        });
-                        locationMarkerRef.current = L.marker([latitude, longitude], { icon: pulsingIcon, zIndexOffset: 1000 }).addTo(
-                            mapRef.current
-                        );
-                    } else {
-                        locationMarkerRef.current.setLatLng([latitude, longitude]);
-                    }
-
-                    // Accuracy circle
-                    if (!accuracyCircleRef.current) {
-                        accuracyCircleRef.current = L.circle([latitude, longitude], {
-                            radius: accuracy,
-                            color: "#4fc3f7",
-                            fillColor: "#4fc3f7",
-                            fillOpacity: 0.1,
-                            weight: 1,
-                        }).addTo(mapRef.current);
-                    } else {
-                        accuracyCircleRef.current.setLatLng([latitude, longitude]);
-                        accuracyCircleRef.current.setRadius(accuracy);
-                    }
-                }
-            },
-            (error) => {
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        setLocationError("Location permission denied. Please allow location access in your browser settings.");
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        setLocationError("Location information is currently unavailable.");
-                        break;
-                    case error.TIMEOUT:
-                        setLocationError("Location request timed out. Make sure you are under an open sky.");
-                        break;
-                    default:
-                        setLocationError("An unknown location error occurred.");
-                }
-                setTrackingActive(false);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 1000,
+    // Robust Geolocation Tracking Effect
+    useEffect(() => {
+        if (!trackingActive) {
+            if (watchIdRef.current !== null) {
+                navigator.geolocation.clearWatch(watchIdRef.current);
+                watchIdRef.current = null;
             }
-        );
+            if (locationMarkerRef.current && mapRef.current) {
+                mapRef.current.removeLayer(locationMarkerRef.current);
+                locationMarkerRef.current = null;
+            }
+            if (accuracyCircleRef.current && mapRef.current) {
+                mapRef.current.removeLayer(accuracyCircleRef.current);
+                accuracyCircleRef.current = null;
+            }
+            return;
+        }
 
+        const onLocationSuccess = (position: GeolocationPosition) => {
+            const { latitude, longitude, accuracy } = position.coords;
+            setLocationError(null);
+
+            // Accuracy threshold - ignore if extremely poor (e.g. tower triangulated > 100m)
+            if (accuracy > 100 && lastLocationRef.current) return;
+
+            if (lastLocationRef.current && mapRef.current) {
+                const dist = mapRef.current.distance(
+                    [lastLocationRef.current.lat, lastLocationRef.current.lng],
+                    [latitude, longitude]
+                );
+
+                // Threshold: Ignore movements < 5m unless accuracy improves significantly
+                if (dist < 5 && accuracy >= lastLocationRef.current.accuracy - 2) return;
+            }
+
+            const newLoc = { lat: latitude, lng: longitude, accuracy };
+            lastLocationRef.current = newLoc;
+            setUserLocation(newLoc);
+
+            // Business logic
+            const campus = campusAreas.find((a) => a.id === "campus-boundary");
+            if (campus) {
+                setIsOnCampus(isPointInPolygon([latitude, longitude], campus.coordinates));
+            }
+
+            let foundBuilding: string | null = null;
+            for (const area of campusAreas) {
+                if (area.id === "campus-boundary" || area.type !== "polygon") continue;
+                if (isPointInPolygon([latitude, longitude], area.coordinates)) {
+                    foundBuilding = area.name;
+                    break;
+                }
+            }
+            setCurrentBuilding(foundBuilding);
+            const nearest = findNearestBuilding(latitude, longitude);
+            setNearestBuilding(nearest ? nearest.name : null);
+
+            // Map updates
+            if (mapRef.current) {
+                if (!locationMarkerRef.current) {
+                    const pulsingIcon = L.divIcon({
+                        className: "user-location-marker",
+                        html: `<div class="user-dot-pulse"><div class="user-dot-core"></div></div>`,
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12],
+                    });
+                    locationMarkerRef.current = L.marker([latitude, longitude], { icon: pulsingIcon, zIndexOffset: 1000 }).addTo(mapRef.current);
+                } else {
+                    locationMarkerRef.current.setLatLng([latitude, longitude]);
+                }
+
+                if (!accuracyCircleRef.current) {
+                    accuracyCircleRef.current = L.circle([latitude, longitude], {
+                        radius: accuracy,
+                        color: "#4fc3f7",
+                        fillColor: "#4fc3f7",
+                        fillOpacity: 0.1,
+                        weight: 1,
+                    }).addTo(mapRef.current);
+                } else {
+                    accuracyCircleRef.current.setLatLng([latitude, longitude]);
+                    accuracyCircleRef.current.setRadius(accuracy);
+                }
+            }
+        };
+
+        const onLocationError = (error: GeolocationPositionError) => {
+            console.warn("Geolocation warning:", error.message);
+            if (error.code === error.PERMISSION_DENIED) {
+                setLocationError("Location permission denied. Please enable GPS.");
+                setTrackingActive(false);
+            } else if (error.code === error.TIMEOUT) {
+                // Transient timeout, ignore and let watchPosition retry
+            } else {
+                setLocationError("Searching for GPS fix...");
+            }
+        };
+
+        const watchOptions = {
+            enableHighAccuracy: true,
+            timeout: 30000,
+            maximumAge: 0,
+        };
+
+        const watchId = navigator.geolocation.watchPosition(onLocationSuccess, onLocationError, watchOptions);
         watchIdRef.current = watchId;
+
+        // Auto-restart tracking on visibility change (reopening tab)
+        const handleVisibility = () => {
+            if (document.visibilityState === 'visible' && trackingActive) {
+                navigator.geolocation.clearWatch(watchIdRef.current!);
+                watchIdRef.current = navigator.geolocation.watchPosition(onLocationSuccess, onLocationError, watchOptions);
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibility);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibility);
+            if (watchIdRef.current !== null) {
+                navigator.geolocation.clearWatch(watchIdRef.current);
+                watchIdRef.current = null;
+            }
+        };
     }, [trackingActive]);
 
     // Center on user location

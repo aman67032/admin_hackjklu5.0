@@ -43,29 +43,34 @@ export default function CheckinPage() {
     }, []);
 
     const searchParticipants = useCallback(async (query: string) => {
-        if (!query.trim()) { setResults([]); return; }
+        if (!query.trim()) { 
+            setResults([]); 
+            setStats({ total: 0, checkedIn: 0 });
+            return; 
+        }
         setLoading(true);
         try {
             const data = await teamsApi.list({ search: query, limit: "20" });
-            setResults(data.teams);
-
-            // Calculate check-in stats
-            let total = data.pagination.total;
-            let checkedIn = data.teams.filter(t => t.checkedIn).length; // This is just an estimate from the current page
-            // Better to have a separate stats API but for now we'll update it based on what we see
-            setStats({ total, checkedIn });
+            setResults(data.teams || []);
+            setStats({ 
+                total: data.pagination?.total || 0, 
+                checkedIn: (data.teams || []).filter((t: any) => t.checkedIn).length 
+            });
         } catch (err) {
-            console.error(err);
+            console.error("Search error:", err);
+            setResults([]);
         } finally {
             setLoading(false);
         }
     }, []);
 
-    const handleSearch = (val: string) => {
-        setSearch(val);
-        const timeout = setTimeout(() => searchParticipants(val), 300);
-        return () => clearTimeout(timeout);
-    };
+    // Debounced search effect
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            searchParticipants(search);
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [search, searchParticipants]);
 
     const toggleTeamCheckin = async (teamId: string, teamName: string, leaderName: string) => {
         try {
@@ -141,7 +146,7 @@ export default function CheckinPage() {
                         <input
                             type="text"
                             value={search}
-                            onChange={(e) => handleSearch(e.target.value)}
+                            onChange={(e) => setSearch(e.target.value)}
                             className="input-olympus w-full py-4 md:py-5 pl-12 md:pl-14 text-base md:text-xl font-medium placeholder:text-gray-600 transition-all duration-300"
                             placeholder="Search Team or Captain..."
                             autoFocus

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Shield, User, Search, Github, Linkedin, FileText, Check, X, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
-import { teamsApi } from "@/lib/api";
+import { Shield, User, Search, Github, Linkedin, FileText, Check, X, ArrowLeft, ArrowRight, ExternalLink, Download } from "lucide-react";
+import { teamsApi, exportsApi, downloadCSV } from "@/lib/api";
 
 export default function RegistrationsPage() {
     const [teams, setTeams] = useState<any[]>([]);
@@ -48,6 +48,30 @@ export default function RegistrationsPage() {
             loadTeams(pagination.page);
         } catch (err) {
             console.error(err);
+        }
+    };
+
+    const handleExport = async () => {
+        try {
+            const params: Record<string, string> = {};
+            if (search) params.search = search;
+            Object.entries(filters).forEach(([k, v]) => { if (v) params[k] = v; });
+
+            let csvData = "";
+            let fileName = "";
+
+            if (viewMode === "team") {
+                csvData = await exportsApi.teams(params);
+                fileName = `hackjklu_teams_${new Date().getTime()}.csv`;
+            } else {
+                csvData = await exportsApi.participants(params);
+                fileName = `hackjklu_participants_${new Date().getTime()}.csv`;
+            }
+
+            downloadCSV(csvData, fileName);
+        } catch (err) {
+            console.error("Export failed:", err);
+            alert("Export failed. Please try again.");
         }
     };
 
@@ -133,40 +157,60 @@ export default function RegistrationsPage() {
             </div>
 
             {/* Search & Filters */}
-            <div className="p-4 md:p-5 mb-6 md:mb-8 rounded-2xl border transition-all duration-300 mx-auto w-full max-w-4xl"
+            <div className="mb-8 rounded-2xl border transition-all duration-300 mx-auto w-full max-w-5xl overflow-hidden"
                 style={{
                     background: "#111111",
                     borderColor: "rgba(232, 98, 26, 0.2)",
-                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
                 }}>
-                <div className="flex flex-col md:flex-row gap-3">
-                    <div className="relative flex-1">
-                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={(e) => handleSearchChange(e.target.value)}
-                            className="input-olympus w-full pl-10"
-                            placeholder="Search by name, email, or team name..."
-                        />
+                <div className="p-4 md:p-6 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div className="md:col-span-6 relative">
+                            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500/50" />
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                className="input-olympus w-full pl-10 h-11"
+                                placeholder="Search by name, email, or team..."
+                            />
+                        </div>
+                        <div className="md:col-span-3">
+                            <select value={filters.college} onChange={(e) => handleFilterChange("college", e.target.value)} className="select-olympus w-full h-11">
+                                <option value="">All Colleges</option>
+                                {[...allColleges].sort().map(c => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="md:col-span-3">
+                            <select value={filters.city} onChange={(e) => handleFilterChange("city", e.target.value)} className="select-olympus w-full h-11">
+                                <option value="">All Cities</option>
+                                {[...allCities].sort().map(c => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
-                    <select value={filters.college} onChange={(e) => handleFilterChange("college", e.target.value)} className="select-olympus">
-                        <option value="">All Colleges</option>
-                        {[...allColleges].sort().map(c => (
-                            <option key={c} value={c}>{c}</option>
-                        ))}
-                    </select>
-                    <select value={filters.city} onChange={(e) => handleFilterChange("city", e.target.value)} className="select-olympus">
-                        <option value="">All Cities</option>
-                        {[...allCities].sort().map(c => (
-                            <option key={c} value={c}>{c}</option>
-                        ))}
-                    </select>
-                    <select value={filters.checkedIn} onChange={(e) => handleFilterChange("checkedIn", e.target.value)} className="select-olympus">
-                        <option value="">Check-in Status</option>
-                        <option value="true">Checked In</option>
-                        <option value="false">Not Checked In</option>
-                    </select>
+                    
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-white/5">
+                        <div className="flex items-center gap-4 w-full md:w-auto">
+                            <div className="flex-1 md:flex-none">
+                                <select value={filters.checkedIn} onChange={(e) => handleFilterChange("checkedIn", e.target.value)} className="select-olympus w-full md:w-48 h-10 text-xs">
+                                    <option value="">Check-in Status</option>
+                                    <option value="true">Checked In</option>
+                                    <option value="false">Not Checked In</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button 
+                            onClick={handleExport}
+                            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-orange-900/20 active:scale-95 w-full md:w-auto"
+                        >
+                            <Download size={16} /> EXPORT {viewMode.toUpperCase()} CSV
+                        </button>
+                    </div>
                 </div>
             </div>
 
