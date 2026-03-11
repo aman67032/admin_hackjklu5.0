@@ -37,9 +37,9 @@ export default function SettingsPage() {
         }
     };
 
-    const toggleRegistrationLock = async () => {
+    const updateSetting = async (field: string, value: any) => {
         try {
-            const updated = await settingsApi.update({ registrationLocked: !settings.registrationLocked });
+            const updated = await settingsApi.update({ [field]: value });
             setSettings(updated);
             loadLogs();
         } catch (err) {
@@ -89,19 +89,59 @@ export default function SettingsPage() {
                         {loading ? (
                             <div className="skeleton h-12 rounded-lg" />
                         ) : (
-                            <div className="flex items-center justify-between">
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
                                 <div>
-                                    <p className="text-sm font-medium text-white" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>Registration Lock</p>
-                                    <p className="text-xs text-gray-300" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
-                                        {settings?.registrationLocked ? "Registration is currently locked" : "Registration is currently open"}
+                                    <p className="text-sm font-medium text-white">Registration Lock</p>
+                                    <p className="text-[10px] text-gray-400">
+                                        {settings?.registrationLocked ? "Inbound registrations are CLOSED" : "Inbound registrations are OPEN"}
                                     </p>
                                 </div>
                                 <button
-                                    onClick={toggleRegistrationLock}
+                                    onClick={() => updateSetting('registrationLocked', !settings.registrationLocked)}
                                     className={`toggle-switch ${settings?.registrationLocked ? 'active' : ''}`}
-                                    aria-label="Toggle registration lock"
                                 />
                             </div>
+
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                                <div>
+                                    <p className="text-sm font-medium text-white">Team MOD Lock</p>
+                                    <p className="text-[10px] text-gray-400">
+                                        {settings?.teamModificationLocked ? "Team editing is DISALLOWED" : "Team editing is ALLOWED"}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => updateSetting('teamModificationLocked', !settings.teamModificationLocked)}
+                                    className={`toggle-switch ${settings?.teamModificationLocked ? 'active' : ''}`}
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                                <div>
+                                    <p className="text-sm font-medium text-white">Submission Lock</p>
+                                    <p className="text-[10px] text-gray-400">
+                                        {settings?.submissionLocked ? "Project submissions are CLOSED" : "Project submissions are OPEN"}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => updateSetting('submissionLocked', !settings.submissionLocked)}
+                                    className={`toggle-switch ${settings?.submissionLocked ? 'active' : ''}`}
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                                <div>
+                                    <p className="text-sm font-medium text-white">Public Leaderboard</p>
+                                    <p className="text-[10px] text-gray-400">
+                                        {settings?.leaderboardVisible ? "Leaderboard is VISIBLE to public" : "Leaderboard is HIDDEN from public"}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => updateSetting('leaderboardVisible', !settings.leaderboardVisible)}
+                                    className={`toggle-switch ${settings?.leaderboardVisible ? 'active' : ''}`}
+                                />
+                            </div>
+                        </div>
                         )}
                     </div>
                 </div>
