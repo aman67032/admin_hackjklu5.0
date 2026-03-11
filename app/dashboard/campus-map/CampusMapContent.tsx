@@ -314,8 +314,8 @@ export default function CampusMapContent() {
             const { latitude, longitude, accuracy } = position.coords;
             setLocationError(null);
 
-            // Accuracy threshold - ignore if extremely poor (e.g. tower triangulated > 100m)
-            if (accuracy > 100 && lastLocationRef.current) return;
+            // Accuracy threshold - ignore if extremely poor (e.g. tower triangulated > 50m)
+            if (accuracy > 50 && lastLocationRef.current) return;
 
             if (lastLocationRef.current && mapRef.current) {
                 const dist = mapRef.current.distance(
@@ -323,8 +323,8 @@ export default function CampusMapContent() {
                     [latitude, longitude]
                 );
 
-                // Threshold: Ignore movements < 5m unless accuracy improves significantly
-                if (dist < 5 && accuracy >= lastLocationRef.current.accuracy - 2) return;
+                // Threshold: Ignore micro-movements < 2m to prevent jitter unless accuracy improves
+                if (dist < 2 && accuracy >= lastLocationRef.current.accuracy - 2) return;
             }
 
             const newLoc = { lat: latitude, lng: longitude, accuracy };
@@ -393,14 +393,14 @@ export default function CampusMapContent() {
             } else if (error.code === error.TIMEOUT) {
                 // Transient timeout, ignore and let watchPosition retry
             } else {
-                setLocationError("Searching for GPS fix...");
+                setLocationError("Searching for high-precision GPS fix...");
             }
         };
 
         const watchOptions = {
             enableHighAccuracy: true,
-            timeout: 30000,
-            maximumAge: 0,
+            timeout: 20000,
+            maximumAge: 2000, // Do not rely on cached positions older than 2 seconds
         };
 
         const watchId = navigator.geolocation.watchPosition(onLocationSuccess, onLocationError, watchOptions);
@@ -562,7 +562,10 @@ export default function CampusMapContent() {
         }
 
         .user-location-marker, .accuracy-circle {
-          transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), left 0.8s cubic-bezier(0.4, 0, 0.2, 1), top 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+          /* Removed CSS transition: Leaflet handles marker repositioning natively. 
+             Adding a CSS transition here causes markers to "fly" away from the map 
+             center during zoom events because the CSS animates the instant top/left 
+             shifts that Leaflet does to keep markers pinned to coordinates. */
         }
 
         .searching-highlight-pulse {
