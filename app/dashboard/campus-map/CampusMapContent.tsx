@@ -372,6 +372,8 @@ export default function CampusMapContent() {
 
             // Map updates
             if (mapRef.current) {
+                const isFirstFix = !locationMarkerRef.current;
+                
                 if (!locationMarkerRef.current) {
                     const pulsingIcon = L.divIcon({
                         className: "user-location-marker",
@@ -395,6 +397,11 @@ export default function CampusMapContent() {
                 } else {
                     accuracyCircleRef.current.setLatLng([latitude, longitude]);
                     accuracyCircleRef.current.setRadius(accuracy);
+                }
+
+                // Only center on the very first location fix, not continuously
+                if (isFirstFix && trackingActive) {
+                    mapRef.current.flyTo([latitude, longitude], 19, { duration: 1 });
                 }
             }
         };
@@ -528,9 +535,9 @@ export default function CampusMapContent() {
         }
         .campus-label-content {
           font-family: 'Inter', sans-serif;
-          font-size: 10px;
-          font-weight: 600;
-          color: rgba(255, 255, 255, 0.85);
+          font-size: 14px; /* Increased from 10px */
+          font-weight: 700; /* Made slightly bolder */
+          color: rgba(255, 255, 255, 0.95);
           text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.7);
           white-space: nowrap;
           pointer-events: none;
