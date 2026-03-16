@@ -5,7 +5,7 @@ import { AlertTriangle, Shield, User, Landmark, Utensils, CheckCircle, BookOpen,
 import { statsApi } from "@/lib/api";
 
 interface Stats {
-    teams: { total: number; complete: number; incomplete: number };
+    teams: { total: number; complete: number; incomplete: number; checkedIn: number };
     participants: { total: number; checkedIn: number; notCheckedIn: number };
     batchBreakdown: Record<string, number>;
     courseBreakdown: Record<string, number>;
@@ -180,8 +180,8 @@ export default function DashboardPage() {
                 <StatCard icon={<User size={20} />} label="Hackers" value={stats.participants.total}
                     subtitle={`${stats.participants.checkedIn} in campus`} color="#10B981" />
                 <StatCard icon={<Landmark size={20} />} label="Arrivals"
-                    value={stats.participants.total > 0 ? `${((stats.participants.checkedIn / stats.participants.total) * 100).toFixed(0)}%` : "0%"}
-                    subtitle={`${stats.participants.notCheckedIn} remaining`} color="#f59e0b" />
+                    value={stats.teams.total > 0 ? `${((stats.teams.checkedIn / stats.teams.total) * 100).toFixed(0)}%` : "0%"}
+                    subtitle={`${stats.teams.total - stats.teams.checkedIn} teams remaining`} color="#f59e0b" />
                 <StatCard icon={<Utensils size={20} />} label="Mess" value={stats.messFoodCount}
                     subtitle="opted in" color="#e8621a" />
             </div>
@@ -190,7 +190,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-8 mt-2">
                 <StatCard icon={<Shield size={20} />} label="Ready Teams" value={stats.teams.complete} color="#10B981" />
                 <StatCard icon={<XCircle size={20} />} label="Incomplete" value={stats.teams.incomplete} color="#ef4444" />
-                <StatCard icon={<CheckCircle size={20} />} label="Checked In" value={stats.participants.checkedIn} color="#10B981" />
+                <StatCard icon={<CheckCircle size={20} />} label="Checked In Teams" value={stats.teams.checkedIn} color="#10B981" />
             </div>
 
             {/* Breakdowns */}
